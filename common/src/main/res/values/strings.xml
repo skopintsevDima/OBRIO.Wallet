@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="okay">OK</string>
+    <string name="retry">Retry</string>
+    <string name="idle_message">Show me the money!</string> // TODO: Add meme "Show me the money!"
+    <string name="transactions">Transactions</string>
+    <string name="deposit">Deposit</string>
+    <string name="add_transaction">Add transaction</string>
+    <string name="btc_price_in_usd">BTC price: $%1$s</string>
+    <string name="balance_in_btc">Balance: %s BTC</string>
+    <string name="enter_amount">Enter amount</string>
+    <string name="select_category">Select category</string>
+    <string name="add">Add</string>
+
+    <string name="error_unknown">Something unknown happened…but Trump will fix it…</string>
+
+    <string name="unknown_error_message_to_user">We would recommend to clean and restart the app 🫶</string>
+    <string name="global_crash_message_to_user">Something unexpected happened 😱\n\nWe would recommend to clean and restart the app 🫶</string>
+    <string name="no_transactions_message">No transactions yet. You can add some by tapping on \'Add transaction\' button</string>
+</resources>
