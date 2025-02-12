@@ -6,7 +6,7 @@ import ua.obrio.common.domain.model.TransactionModel
 
 interface AccountRepository {
     fun getUserAccountFlow(): Flow<AccountModel>
-    fun getUserAccount(): AccountModel
+    suspend fun getUserAccount(): AccountModel
     suspend fun updateUserAccount(
         updatedBalanceBTC: Double? = null,
         updatedTransactions: List<TransactionModel>? = null

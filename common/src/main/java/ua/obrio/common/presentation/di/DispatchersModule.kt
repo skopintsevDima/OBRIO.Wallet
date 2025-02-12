@@ -11,5 +11,5 @@ import kotlinx.coroutines.Dispatchers
 @InstallIn(ViewModelComponent::class)
 class DispatchersModule {
     @Provides
-    fun provideBackgroundOpsDispatcher(): CoroutineDispatcher = Dispatchers.Default
+    fun provideBackgroundOpsDispatcher(): CoroutineDispatcher = Dispatchers.IO
 }

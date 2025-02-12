@@ -5,6 +5,6 @@ import ua.obrio.common.domain.model.AccountModel
 
 interface AccountSource {
     fun getUserAccountFlow(): Flow<AccountModel>
-    fun getUserAccount(): AccountModel
+    suspend fun getUserAccount(): AccountModel
     suspend fun updateUserAccount(updatedAccount: AccountModel): Result<Unit>
 }

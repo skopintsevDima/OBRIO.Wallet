@@ -1,4 +1,4 @@
-package ua.obrio.common.data.di
+package ua.obrio.common.data.di.repository
 
 import dagger.Module
 import dagger.Provides

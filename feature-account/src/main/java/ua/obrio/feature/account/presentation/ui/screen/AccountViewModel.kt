@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_DEPOSIT_FAILED
-import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_LOAD_BITCOIN_PRICE
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_LOAD_USER_ACCOUNT
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Common.ERROR_UNKNOWN
 import ua.obrio.feature.account.domain.usecase.DepositUseCase
@@ -48,16 +47,14 @@ class AccountViewModelImpl @Inject constructor(
                         UiResult.Failure(ERROR_LOAD_USER_ACCOUNT, it.message.toString())
                     )
                 }.collectLatest { userAccount ->
-                    val uiResult = try {
-                        val bitcoinExchangeRateUSD = getBitcoinExchangeRateUseCase.execute()
+                    val bitcoinExchangeRateUSD = runCatching {
+                        getBitcoinExchangeRateUseCase.execute()
+                    }.getOrElse { Float.NaN }
 
-                        UiResult.Success.ScreenDataUpdated(
-                            userAccount = userAccount,
-                            bitcoinExchangeRateUSD = bitcoinExchangeRateUSD
-                        )
-                    } catch (e: Throwable) {
-                        UiResult.Failure(ERROR_LOAD_BITCOIN_PRICE, e.message.toString())
-                    }
+                    val uiResult = UiResult.Success.ScreenDataUpdated(
+                        userAccount = userAccount,
+                        bitcoinExchangeRateUSD = bitcoinExchangeRateUSD
+                    )
                     _uiState.value = reduce(_uiState.value, uiResult)
                 }
         }

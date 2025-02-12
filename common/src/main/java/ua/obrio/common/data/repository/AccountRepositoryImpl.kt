@@ -13,7 +13,7 @@ class AccountRepositoryImpl(
         return accountSource.getUserAccountFlow()
     }
 
-    override fun getUserAccount(): AccountModel {
+    override suspend fun getUserAccount(): AccountModel {
         return accountSource.getUserAccount()
     }
 
