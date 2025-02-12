@@ -19,8 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -32,7 +35,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ua.obrio.common.presentation.ui.composable.ErrorSnackBar
 import ua.obrio.common.presentation.ui.composable.LoadingScreen
-import ua.obrio.common.presentation.ui.composable.MessageScreen
 import ua.obrio.common.presentation.ui.composable.TransactionItem
 import ua.obrio.common.presentation.ui.composable.showSnackBarSafe
 import ua.obrio.common.presentation.ui.resources.LocalResources
@@ -41,6 +43,7 @@ import ua.obrio.common.presentation.ui.util.PreviewLightDarkBothOrientations
 import ua.obrio.common.presentation.util.Constants.UI.Account
 import ua.obrio.common.presentation.util.Constants.UI.AddTransaction
 import ua.obrio.common.presentation.util.formatBalanceBTC
+import ua.obrio.feature.account.presentation.ui.screen.composable.DepositDialog
 import ua.obrio.feature.account.presentation.ui.screen.mock.DataStatePreviewProvider
 import ua.obrio.feature.account.presentation.ui.screen.mock.ErrorStatePreviewProvider
 import ua.obrio.feature.account.presentation.ui.screen.mock.MockAccountViewModelWithState
@@ -61,7 +64,6 @@ fun AccountScreen(
                 .padding(paddingValues)
         ) {
             when (val stateValue = uiState.value) {
-                UiState.Idle -> IdleScreen(viewModel)
                 UiState.Loading -> LoadingScreen()
                 is UiState.Error -> ErrorScreen(stateValue, viewModel, snackbarHostState)
                 is UiState.Data -> DataScreen(
@@ -73,15 +75,6 @@ fun AccountScreen(
             }
         }
     }
-}
-
-@Composable
-private fun IdleScreen(viewModel: AccountViewModel) {
-    LaunchedEffect(viewModel) {
-        viewModel.tryHandleIntent(UiIntent.FetchScreenData)
-    }
-
-    MessageScreen(message = stringResource(LocalResources.Strings.IdleMessage))
 }
 
 @Composable
@@ -145,26 +138,31 @@ private fun DataScreen(
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    val onDepositClick = remember(viewModel) { { /*TODO: Navigate to deposit pop-up*/ } }
+    val onDepositConfirmed = remember(viewModel) {
+        { depositAmountBTC: Double ->
+            viewModel.tryHandleIntent(UiIntent.Deposit(depositAmountBTC))
+        }
+    }
     val onAddTransactionClick = remember(viewModel) {
         { navController.navigate(AddTransaction.ROUTE_ID) }
     }
     if (isLandscape) {
-        DataLandscapeScreen(data, onDepositClick, onAddTransactionClick)
+        DataLandscapeScreen(data, onDepositConfirmed, onAddTransactionClick)
     } else {
-        DataPortraitScreen(data, onDepositClick, onAddTransactionClick)
+        DataPortraitScreen(data, onDepositConfirmed, onAddTransactionClick)
     }
 }
 
 @Composable
 fun DataPortraitScreen(
     data: UiState.Data,
-    onDepositClick: () -> Unit,
+    onDepositConfirmed: (Double) -> Unit,
     onAddTransactionClick: () -> Unit
 ) {
     val balanceBTC = remember { data.userBalanceBTC }
     val btcPriceUSD = remember { data.bitcoinExchangeRateUSD }
     val transactions = remember { data.userTransactions }
+    var showDepositDialog by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -187,7 +185,9 @@ fun DataPortraitScreen(
                 fontSize = LocalResources.Dimensions.Text.SizeLarge,
                 fontWeight = FontWeight.Bold
             )
-            Button(onClick = onDepositClick) { Text(stringResource(LocalResources.Strings.Deposit)) }
+            Button(onClick = { showDepositDialog = true }) {
+                Text(stringResource(LocalResources.Strings.Deposit))
+            }
         }
 
         Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Medium))
@@ -227,17 +227,25 @@ fun DataPortraitScreen(
             Text(stringResource(LocalResources.Strings.AddTransaction))
         }
     }
+
+    if (showDepositDialog) {
+        DepositDialog(
+            onDismiss = { showDepositDialog = false },
+            onConfirm = onDepositConfirmed
+        )
+    }
 }
 
 @Composable
 private fun DataLandscapeScreen(
     data: UiState.Data,
-    onDepositClick: () -> Unit,
+    onDepositConfirmed: (Double) -> Unit,
     onAddTransactionClick: () -> Unit
 ) {
     val balanceBTC = remember { data.userBalanceBTC }
     val btcPriceUSD = remember { data.bitcoinExchangeRateUSD }
     val transactions = remember { data.userTransactions }
+    var showDepositDialog by remember { mutableStateOf(false) }
 
     Row(modifier = Modifier
         .fillMaxSize()
@@ -265,7 +273,9 @@ private fun DataLandscapeScreen(
                     fontSize = LocalResources.Dimensions.Text.SizeLarge,
                     fontWeight = FontWeight.Bold
                 )
-                Button(onClick = onDepositClick) { Text(stringResource(LocalResources.Strings.Deposit)) }
+                Button(onClick = { showDepositDialog = true }) {
+                    Text(stringResource(LocalResources.Strings.Deposit))
+                }
             }
         }
 
@@ -307,12 +317,13 @@ private fun DataLandscapeScreen(
             }
         }
     }
-}
 
-@PreviewLightDarkBothOrientations
-@Composable
-private fun IdlePreview() {
-    AccountScreenPreviewWrapper(MockUiState.Idle)
+    if (showDepositDialog) {
+        DepositDialog(
+            onDismiss = { showDepositDialog = false },
+            onConfirm = onDepositConfirmed
+        )
+    }
 }
 
 @PreviewLightDarkBothOrientations

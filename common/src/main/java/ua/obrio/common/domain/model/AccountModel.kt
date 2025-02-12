@@ -1,6 +1,6 @@
 package ua.obrio.common.domain.model
 
 data class AccountModel(
-    val currentAmountBTC: Double,
+    val currentBalanceBTC: Double,
     val transactions: List<TransactionModel>
 )

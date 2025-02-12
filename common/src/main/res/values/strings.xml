@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="okay">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="retry">Retry</string>
     <string name="idle_message">Show me the money!</string> // TODO: Add meme "Show me the money!"
     <string name="transactions">Transactions</string>

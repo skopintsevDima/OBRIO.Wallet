@@ -8,7 +8,6 @@ import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
 
 sealed class UiState {
-    data object Idle: UiState()
     data object Loading: UiState()
 
     data class Data(
@@ -27,7 +26,7 @@ sealed class UiState {
 }
 
 sealed class UiIntent {
-    data object FetchScreenData: UiIntent()
+    data class Deposit(val amountBTC: Double): UiIntent()
 }
 
 sealed class UiResult {
@@ -38,6 +37,8 @@ sealed class UiResult {
             val userAccount: AccountModel,
             val bitcoinExchangeRateUSD: Float
         ): Success()
+
+        data object DepositSucceeded: Success()
     }
 
     data class Failure(val errorCode: Int, val errorMsg: String = ""): UiResult() {

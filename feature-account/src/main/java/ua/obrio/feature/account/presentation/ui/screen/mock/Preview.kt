@@ -20,7 +20,6 @@ internal class MockAccountViewModelWithState(
 }
 
 internal object MockUiState {
-    val Idle = UiState.Idle
     val Loading = UiState.Loading
     val ErrorUnknown = UiState.Error.UnknownError("An unknown error occurred")
     val Data = UiState.Data(

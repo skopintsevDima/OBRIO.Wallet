@@ -4,7 +4,9 @@ object Constants {
     object ErrorCodes {
         object Account {
             const val ERROR_ACCOUNT_NO_DATA = 101
-            const val ERROR_LOAD_ACCOUNT_DATA = 102
+            const val ERROR_LOAD_USER_ACCOUNT = 102
+            const val ERROR_LOAD_BITCOIN_PRICE = 103
+            const val ERROR_DEPOSIT_FAILED = 104
         }
 
         object Common {

@@ -20,6 +20,7 @@ object LocalResources {
         val IdleMessage = R.string.idle_message
         val Retry = R.string.retry
         val Okay = R.string.okay
+        val Cancel = R.string.cancel
         val Transactions = R.string.transactions
         val Deposit = R.string.deposit
         val AddTransaction = R.string.add_transaction
