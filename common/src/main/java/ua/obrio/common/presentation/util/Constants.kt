@@ -7,6 +7,10 @@ object Constants {
             const val ERROR_LOAD_USER_ACCOUNT = 102
             const val ERROR_LOAD_BITCOIN_PRICE = 103
             const val ERROR_DEPOSIT_FAILED = 104
+            const val ERROR_NO_DATA_FOR_TRANSACTION = 105
+            const val ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION = 106 // TODO: Show error for user
+            const val ERROR_MISSING_CATEGORY_FOR_TRANSACTION = 107
+            const val ERROR_ADDING_TRANSACTION_FAILED = 108
         }
 
         object Common {

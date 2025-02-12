@@ -159,9 +159,9 @@ fun DataPortraitScreen(
     onDepositConfirmed: (Double) -> Unit,
     onAddTransactionClick: () -> Unit
 ) {
-    val balanceBTC = remember { data.userBalanceBTC }
-    val btcPriceUSD = remember { data.bitcoinExchangeRateUSD }
-    val transactions = remember { data.userTransactions }
+    val balanceBTC = remember(data) { data.userBalanceBTC }
+    val btcPriceUSD = remember(data) { data.bitcoinExchangeRateUSD }
+    val transactions = remember(data) { data.userTransactions }
     var showDepositDialog by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier
@@ -242,9 +242,9 @@ private fun DataLandscapeScreen(
     onDepositConfirmed: (Double) -> Unit,
     onAddTransactionClick: () -> Unit
 ) {
-    val balanceBTC = remember { data.userBalanceBTC }
-    val btcPriceUSD = remember { data.bitcoinExchangeRateUSD }
-    val transactions = remember { data.userTransactions }
+    val balanceBTC = remember(data) { data.userBalanceBTC }
+    val btcPriceUSD = remember(data) { data.bitcoinExchangeRateUSD }
+    val transactions = remember(data) { data.userTransactions }
     var showDepositDialog by remember { mutableStateOf(false) }
 
     Row(modifier = Modifier

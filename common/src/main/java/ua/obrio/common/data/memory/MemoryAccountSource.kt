@@ -11,8 +11,12 @@ import java.time.LocalDateTime
 class MemoryAccountSource : AccountSource {
     private var userAccountState = MutableStateFlow(FAKE_ACCOUNT.copy())
 
-    override fun getUserAccount(): Flow<AccountModel> {
+    override fun getUserAccountFlow(): Flow<AccountModel> {
         return userAccountState
+    }
+
+    override fun getUserAccount(): AccountModel {
+        return userAccountState.value
     }
 
     override suspend fun updateUserAccount(updatedAccount: AccountModel): Result<Unit> {

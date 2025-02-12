@@ -26,7 +26,7 @@ fun TransactionItem(transaction: TransactionModel) {
     ) {
         Column {
             Text(
-                text = transaction.category.nameFormatted,
+                text = transaction.category?.nameFormatted ?: "",
                 fontSize = LocalResources.Dimensions.Text.SizeMedium,
                 fontWeight = FontWeight.SemiBold
             )

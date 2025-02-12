@@ -16,7 +16,7 @@ import ua.obrio.feature.account.presentation.usecase.GetUserAccountUseCaseImpl
 @InstallIn(SingletonComponent::class)
 class UseCaseModule {
     @Provides
-    fun provideGetBookSummaryUseCase(
+    fun provideGetUserAccountUseCase(
         accountRepository: AccountRepository
     ): GetUserAccountUseCase = GetUserAccountUseCaseImpl(accountRepository)
 

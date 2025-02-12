@@ -9,8 +9,8 @@ import ua.obrio.feature.account.domain.usecase.GetUserAccountUseCase
 class GetUserAccountUseCaseImpl(
     private val accountRepository: AccountRepository
 ): GetUserAccountUseCase {
-    override suspend fun execute(): Flow<AccountModel?> {
+    override suspend fun execute(): Flow<AccountModel> {
         delay(500L) // TODO: Remove
-        return accountRepository.getUserAccount()
+        return accountRepository.getUserAccountFlow()
     }
 }

@@ -33,7 +33,7 @@ sealed class UiResult {
     data object Loading: UiResult()
 
     sealed class Success: UiResult() {
-        data class ScreenDataFetched(
+        data class ScreenDataUpdated(
             val userAccount: AccountModel,
             val bitcoinExchangeRateUSD: Float
         ): Success()

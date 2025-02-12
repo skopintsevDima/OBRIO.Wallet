@@ -43,6 +43,7 @@ import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.theme.OBRIOWalletTheme
 import ua.obrio.common.presentation.ui.util.PreviewLightDarkBothOrientations
 import ua.obrio.common.presentation.util.Constants.UI.AddTransaction
+import ua.obrio.common.presentation.util.isValidDoubleOrEmpty
 import ua.obrio.feature.add_transaction.presentation.ui.screen.mock.DataStatePreviewProvider
 import ua.obrio.feature.add_transaction.presentation.ui.screen.mock.ErrorStatePreviewProvider
 import ua.obrio.feature.add_transaction.presentation.ui.screen.mock.MockAddTransactionViewModelWithState
@@ -149,7 +150,9 @@ private fun DataScreen(
         TextField(
             value = strEnteredAmountBTC,
             onValueChange = {
-                viewModel.tryHandleIntent(UiIntent.UpdateEnteredAmount(it))
+                if (it.isValidDoubleOrEmpty()) {
+                    viewModel.tryHandleIntent(UiIntent.UpdateEnteredAmount(it))
+                }
             },
             label = { Text(stringResource(LocalResources.Strings.EnterAmount)) },
             keyboardOptions = KeyboardOptions.Default.copy(

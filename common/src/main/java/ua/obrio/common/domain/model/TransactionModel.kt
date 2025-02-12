@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 data class TransactionModel(
     val dateTime: LocalDateTime,
     val amountBTC: Double,
-    val category: Category
+    val category: Category? = null
 ) {
     enum class Category {
         GROCERIES, TAXI, ELECTRONICS, RESTAURANT, OTHER;

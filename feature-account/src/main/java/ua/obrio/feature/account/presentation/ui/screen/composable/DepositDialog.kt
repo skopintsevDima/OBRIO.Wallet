@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import ua.obrio.common.presentation.ui.resources.LocalResources
+import ua.obrio.common.presentation.util.isValidDoubleOrEmpty
 
 @Composable
 fun DepositDialog(
@@ -37,7 +38,11 @@ fun DepositDialog(
             Column {
                 TextField(
                     value = amount,
-                    onValueChange = { amount = it },
+                    onValueChange = {
+                        if (it.text.isValidDoubleOrEmpty()) {
+                            amount = it
+                        }
+                    },
                     label = { Text(stringResource(LocalResources.Strings.EnterAmount)) },
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,

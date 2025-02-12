@@ -9,9 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import ua.obrio.common.domain.model.AccountModel
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
-import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_ACCOUNT_NO_DATA
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_DEPOSIT_FAILED
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_LOAD_BITCOIN_PRICE
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_LOAD_USER_ACCOUNT
@@ -37,8 +35,6 @@ class AccountViewModelImpl @Inject constructor(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     override val uiState: StateFlow<UiState> = _uiState
 
-    private var userAccount: AccountModel? = null
-
     init {
         observeUserAccountUpdates()
     }
@@ -52,20 +48,15 @@ class AccountViewModelImpl @Inject constructor(
                         UiResult.Failure(ERROR_LOAD_USER_ACCOUNT, it.message.toString())
                     )
                 }.collectLatest { userAccount ->
-                    val uiResult = if (userAccount == null) {
-                        UiResult.Failure(ERROR_ACCOUNT_NO_DATA)
-                    } else {
-                        this@AccountViewModelImpl.userAccount = userAccount
-                        try {
-                            val bitcoinExchangeRateUSD = getBitcoinExchangeRateUseCase.execute()
+                    val uiResult = try {
+                        val bitcoinExchangeRateUSD = getBitcoinExchangeRateUseCase.execute()
 
-                            UiResult.Success.ScreenDataFetched(
-                                userAccount = userAccount,
-                                bitcoinExchangeRateUSD = bitcoinExchangeRateUSD
-                            )
-                        } catch (e: Throwable) {
-                            UiResult.Failure(ERROR_LOAD_BITCOIN_PRICE, e.message.toString())
-                        }
+                        UiResult.Success.ScreenDataUpdated(
+                            userAccount = userAccount,
+                            bitcoinExchangeRateUSD = bitcoinExchangeRateUSD
+                        )
+                    } catch (e: Throwable) {
+                        UiResult.Failure(ERROR_LOAD_BITCOIN_PRICE, e.message.toString())
                     }
                     _uiState.value = reduce(_uiState.value, uiResult)
                 }
@@ -97,7 +88,7 @@ class AccountViewModelImpl @Inject constructor(
     private fun reduce(previousState: UiState, result: UiResult): UiState = when (result) {
         UiResult.Loading -> UiState.Loading
 
-        is UiResult.Success.ScreenDataFetched -> {
+        is UiResult.Success.ScreenDataUpdated -> {
             UiState.Data(
                 userBalanceBTC = result.userAccount.currentBalanceBTC,
                 userTransactions = result.userAccount.transactions,
@@ -115,13 +106,7 @@ class AccountViewModelImpl @Inject constructor(
 
     private suspend fun deposit(depositAmountBTC: Double): UiResult {
         try {
-            val currentUserBalanceBTC = userAccount?.currentBalanceBTC
-                ?: return UiResult.Failure(ERROR_ACCOUNT_NO_DATA)
-
-            val depositResult = depositUseCase.execute(
-                currentUserBalanceBTC,
-                depositAmountBTC
-            )
+            val depositResult = depositUseCase.execute(depositAmountBTC)
 
             return depositResult.fold(
                 onSuccess = { UiResult.Success.DepositSucceeded },
