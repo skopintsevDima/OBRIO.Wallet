@@ -5,12 +5,15 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ua.obrio.common.domain.repository.AccountRepository
+import ua.obrio.common.domain.repository.TransactionsRepository
 import ua.obrio.feature.account.domain.usecase.DepositUseCase
 import ua.obrio.feature.account.domain.usecase.GetBitcoinExchangeRateUseCase
-import ua.obrio.feature.account.domain.usecase.GetUserAccountUseCase
+import ua.obrio.feature.account.domain.usecase.GetUserAccountFlowUseCase
+import ua.obrio.feature.account.domain.usecase.GetUserTransactionsPagedUseCase
 import ua.obrio.feature.account.presentation.usecase.DepositUseCaseImpl
 import ua.obrio.feature.account.presentation.usecase.GetBitcoinExchangeRateUseCaseImpl
-import ua.obrio.feature.account.presentation.usecase.GetUserAccountUseCaseImpl
+import ua.obrio.feature.account.presentation.usecase.GetUserAccountFlowUseCaseImpl
+import ua.obrio.feature.account.presentation.usecase.GetUserTransactionsPagedUseCaseImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -18,7 +21,14 @@ class UseCaseModule {
     @Provides
     fun provideGetUserAccountUseCase(
         accountRepository: AccountRepository
-    ): GetUserAccountUseCase = GetUserAccountUseCaseImpl(accountRepository)
+    ): GetUserAccountFlowUseCase = GetUserAccountFlowUseCaseImpl(accountRepository)
+
+    @Provides
+    fun provideGetUserTransactionsPagedUseCase(
+        transactionsRepository: TransactionsRepository
+    ): GetUserTransactionsPagedUseCase = GetUserTransactionsPagedUseCaseImpl(
+        transactionsRepository
+    )
 
     @Provides
     fun provideGetBitcoinExchangeRateUseCase(): GetBitcoinExchangeRateUseCase =
@@ -26,6 +36,10 @@ class UseCaseModule {
 
     @Provides
     fun provideDepositUseCase(
-        accountRepository: AccountRepository
-    ): DepositUseCase = DepositUseCaseImpl(accountRepository)
+        accountRepository: AccountRepository,
+        transactionsRepository: TransactionsRepository
+    ): DepositUseCase = DepositUseCaseImpl(
+        accountRepository,
+        transactionsRepository
+    )
 }

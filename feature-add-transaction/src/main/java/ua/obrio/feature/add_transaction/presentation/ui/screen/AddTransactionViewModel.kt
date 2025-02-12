@@ -7,7 +7,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import ua.obrio.common.domain.model.TransactionModel
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_ADDING_TRANSACTION_FAILED
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION
@@ -76,12 +75,11 @@ class AddTransactionViewModelImpl @Inject constructor(
                 val transactionCategory = selectedCategory
                     ?: return@run UiResult.Failure(ERROR_MISSING_CATEGORY_FOR_TRANSACTION)
 
-                val transaction = TransactionModel(
+                addTransactionUseCase.execute(
                     dateTime = LocalDateTime.now(),
                     amountBTC = -transactionAmountBTC,
                     category = transactionCategory
-                )
-                addTransactionUseCase.execute(transaction).fold(
+                ).fold(
                     onSuccess = { UiResult.Success.TransactionAdded },
                     onFailure = { UiResult.Failure(ERROR_ADDING_TRANSACTION_FAILED) }
                 )

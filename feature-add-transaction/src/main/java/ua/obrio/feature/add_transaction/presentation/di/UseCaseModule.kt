@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ua.obrio.common.domain.repository.AccountRepository
+import ua.obrio.common.domain.repository.TransactionsRepository
 import ua.obrio.feature.add_transaction.domain.usecase.AddTransactionUseCase
 import ua.obrio.feature.add_transaction.presentation.usecase.AddTransactionUseCaseImpl
 
@@ -13,6 +14,10 @@ import ua.obrio.feature.add_transaction.presentation.usecase.AddTransactionUseCa
 class UseCaseModule {
     @Provides
     fun provideAddTransactionUseCase(
-        accountRepository: AccountRepository
-    ): AddTransactionUseCase = AddTransactionUseCaseImpl(accountRepository)
+        accountRepository: AccountRepository,
+        transactionsRepository: TransactionsRepository
+    ): AddTransactionUseCase = AddTransactionUseCaseImpl(
+        accountRepository,
+        transactionsRepository
+    )
 }

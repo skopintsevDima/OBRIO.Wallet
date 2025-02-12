@@ -1,6 +1,7 @@
 package ua.obrio.feature.account.presentation.ui.screen
 
-import androidx.compose.runtime.Stable
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
 import ua.obrio.common.domain.model.AccountModel
 import ua.obrio.common.domain.model.TransactionModel
 import ua.obrio.common.presentation.ui.model.NonCriticalError
@@ -12,7 +13,7 @@ sealed class UiState {
 
     data class Data(
         val userBalanceBTC: Double,
-        @Stable val userTransactions: List<TransactionModel>,
+        val userTransactions: Flow<PagingData<TransactionModel>>,
         val bitcoinExchangeRateUSD: Float,
         val nonCriticalError: NonCriticalError? = null
     ): UiState()
@@ -35,6 +36,7 @@ sealed class UiResult {
     sealed class Success: UiResult() {
         data class ScreenDataUpdated(
             val userAccount: AccountModel,
+            val userTransactionsPaged: Flow<PagingData<TransactionModel>>,
             val bitcoinExchangeRateUSD: Float
         ): Success()
 

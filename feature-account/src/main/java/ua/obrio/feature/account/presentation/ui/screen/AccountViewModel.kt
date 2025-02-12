@@ -2,6 +2,7 @@ package ua.obrio.feature.account.presentation.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,13 +10,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_DEPOSIT_FAILED
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_LOAD_USER_ACCOUNT
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Common.ERROR_UNKNOWN
 import ua.obrio.feature.account.domain.usecase.DepositUseCase
 import ua.obrio.feature.account.domain.usecase.GetBitcoinExchangeRateUseCase
-import ua.obrio.feature.account.domain.usecase.GetUserAccountUseCase
+import ua.obrio.feature.account.domain.usecase.GetUserAccountFlowUseCase
+import ua.obrio.feature.account.domain.usecase.GetUserTransactionsPagedUseCase
 import javax.inject.Inject
 
 interface AccountViewModel {
@@ -25,7 +28,8 @@ interface AccountViewModel {
 
 @HiltViewModel
 class AccountViewModelImpl @Inject constructor(
-    private val getUserAccountUseCase: GetUserAccountUseCase,
+    private val getUserAccountFlowUseCase: GetUserAccountFlowUseCase,
+    private val getUserTransactionsPagedUseCase: GetUserTransactionsPagedUseCase,
     private val getBitcoinExchangeRateUseCase: GetBitcoinExchangeRateUseCase,
     private val depositUseCase: DepositUseCase,
     private val resourceProvider: ResourceProvider,
@@ -40,7 +44,7 @@ class AccountViewModelImpl @Inject constructor(
 
     private fun observeUserAccountUpdates() {
         viewModelScope.launch(backgroundOpsDispatcher) {
-            getUserAccountUseCase.execute()
+            getUserAccountFlowUseCase.execute()
                 .catch {
                     _uiState.value = reduce(
                         _uiState.value,
@@ -51,8 +55,12 @@ class AccountViewModelImpl @Inject constructor(
                         getBitcoinExchangeRateUseCase.execute()
                     }.getOrElse { Float.NaN }
 
+                    val userTransactionsPaged = getUserTransactionsPagedUseCase.execute()
+                        .cachedIn(viewModelScope + backgroundOpsDispatcher)
+
                     val uiResult = UiResult.Success.ScreenDataUpdated(
                         userAccount = userAccount,
+                        userTransactionsPaged = userTransactionsPaged,
                         bitcoinExchangeRateUSD = bitcoinExchangeRateUSD
                     )
                     _uiState.value = reduce(_uiState.value, uiResult)
@@ -88,7 +96,7 @@ class AccountViewModelImpl @Inject constructor(
         is UiResult.Success.ScreenDataUpdated -> {
             UiState.Data(
                 userBalanceBTC = result.userAccount.currentBalanceBTC,
-                userTransactions = result.userAccount.transactions,
+                userTransactions = result.userTransactionsPaged,
                 bitcoinExchangeRateUSD = result.bitcoinExchangeRateUSD
             )
         }

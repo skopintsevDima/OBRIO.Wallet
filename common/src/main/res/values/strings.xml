@@ -18,4 +18,5 @@
     <string name="unknown_error_message_to_user">We would recommend to clean and restart the app 🫶</string>
     <string name="global_crash_message_to_user">Something unexpected happened 😱\n\nWe would recommend to clean and restart the app 🫶</string>
     <string name="no_transactions_message">No transactions yet. You can add some by tapping on \'Add transaction\' button</string>
+    <string name="loading_transactions_failed_message">Loading transactions failed. Click \'Retry\' to try again</string>
 </resources>

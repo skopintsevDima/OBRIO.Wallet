@@ -35,6 +35,7 @@ object LocalResources {
         val UnknownErrorMessage = R.string.unknown_error_message_to_user
         val GlobalCrashMessage = R.string.global_crash_message_to_user
         val NoTransactionsMessage = R.string.no_transactions_message
+        val LoadingTransactionsFailedMessage = R.string.loading_transactions_failed_message
     }
 
     object Colors {
@@ -90,6 +91,8 @@ object LocalResources {
         }
 
         object Size {
+            val ProgressIndicator = 32.dp
+
             val BorderWidth = 1.dp
             val ButtonCornerRadius = 8.dp
 

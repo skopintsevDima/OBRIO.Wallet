@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -33,9 +31,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import ua.obrio.common.domain.model.TransactionModel
 import ua.obrio.common.presentation.ui.composable.ErrorSnackBar
 import ua.obrio.common.presentation.ui.composable.LoadingScreen
-import ua.obrio.common.presentation.ui.composable.TransactionItem
+import ua.obrio.common.presentation.ui.composable.TransactionsList
 import ua.obrio.common.presentation.ui.composable.showSnackBarSafe
 import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.theme.OBRIOWalletTheme
@@ -146,22 +147,23 @@ private fun DataScreen(
     val onAddTransactionClick = remember(viewModel) {
         { navController.navigate(AddTransaction.ROUTE_ID) }
     }
+    val userTransactions = data.userTransactions.collectAsLazyPagingItems()
     if (isLandscape) {
-        DataLandscapeScreen(data, onDepositConfirmed, onAddTransactionClick)
+        DataLandscapeScreen(data, userTransactions, onDepositConfirmed, onAddTransactionClick)
     } else {
-        DataPortraitScreen(data, onDepositConfirmed, onAddTransactionClick)
+        DataPortraitScreen(data, userTransactions, onDepositConfirmed, onAddTransactionClick)
     }
 }
 
 @Composable
 fun DataPortraitScreen(
     data: UiState.Data,
+    userTransactions: LazyPagingItems<TransactionModel>,
     onDepositConfirmed: (Double) -> Unit,
     onAddTransactionClick: () -> Unit
 ) {
     val balanceBTC = remember(data) { data.userBalanceBTC }
     val btcPriceUSD = remember(data) { data.bitcoinExchangeRateUSD }
-    val transactions = remember(data) { data.userTransactions }
     var showDepositDialog by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier
@@ -198,25 +200,12 @@ fun DataPortraitScreen(
         )
         Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Small))
 
-        if (transactions.isEmpty()) {
-            Box(
-                modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(LocalResources.Strings.NoTransactionsMessage),
-                    fontSize = LocalResources.Dimensions.Text.SizeMedium,
-                    color = LocalResources.Colors.Gray,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
-            }
-        } else {
-            LazyColumn(modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL)) {
-                itemsIndexed(transactions) { _, transaction ->
-                    TransactionItem(transaction)
-                }
-            }
-        }
+        TransactionsList(
+            modifier = Modifier.weight(
+                LocalResources.Dimensions.Size.FillWidth.FULL
+            ),
+            userTransactions
+        )
 
         Button(
             onClick = onAddTransactionClick,
@@ -239,12 +228,12 @@ fun DataPortraitScreen(
 @Composable
 private fun DataLandscapeScreen(
     data: UiState.Data,
+    userTransactions: LazyPagingItems<TransactionModel>,
     onDepositConfirmed: (Double) -> Unit,
     onAddTransactionClick: () -> Unit
 ) {
     val balanceBTC = remember(data) { data.userBalanceBTC }
     val btcPriceUSD = remember(data) { data.bitcoinExchangeRateUSD }
-    val transactions = remember(data) { data.userTransactions }
     var showDepositDialog by remember { mutableStateOf(false) }
 
     Row(modifier = Modifier
@@ -287,25 +276,12 @@ private fun DataLandscapeScreen(
             )
             Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Small))
 
-            if (transactions.isEmpty()) {
-                Box(
-                    modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(LocalResources.Strings.NoTransactionsMessage),
-                        fontSize = LocalResources.Dimensions.Text.SizeMedium,
-                        color = LocalResources.Colors.Gray,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    )
-                }
-            } else {
-                LazyColumn(modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL)) {
-                    itemsIndexed(transactions) { _, transaction ->
-                        TransactionItem(transaction)
-                    }
-                }
-            }
+            TransactionsList(
+                modifier = Modifier.weight(
+                    LocalResources.Dimensions.Size.FillWidth.FULL
+                ),
+                userTransactions
+            )
 
             Button(
                 onClick = onAddTransactionClick,

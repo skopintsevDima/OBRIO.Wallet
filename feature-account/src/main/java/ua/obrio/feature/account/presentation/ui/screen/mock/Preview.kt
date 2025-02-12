@@ -1,8 +1,10 @@
 package ua.obrio.feature.account.presentation.ui.screen.mock
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import ua.obrio.common.domain.model.TransactionModel
 import ua.obrio.feature.account.presentation.ui.screen.AccountViewModel
 import ua.obrio.feature.account.presentation.ui.screen.UiIntent
@@ -24,114 +26,120 @@ internal object MockUiState {
     val ErrorUnknown = UiState.Error.UnknownError("An unknown error occurred")
     val Data = UiState.Data(
         userBalanceBTC = 100.32765,
-        userTransactions = listOf(
-            TransactionModel(
-                LocalDateTime.now(),
-                5.15,
-                TransactionModel.Category.TAXI
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                -246.86938600,
-                TransactionModel.Category.RESTAURANT
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                12.35,
-                TransactionModel.Category.OTHER
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                -4.11,
-                TransactionModel.Category.GROCERIES
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                -1863.1375,
-                TransactionModel.Category.ELECTRONICS
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                267.170,
-                TransactionModel.Category.TAXI
-            ),
+        userTransactions = flowOf(
+            PagingData.from(listOf(
+                TransactionModel(
+                    LocalDateTime.now(),
+                    5.15,
+                    TransactionModel.Category.TAXI
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    -246.86938600,
+                    TransactionModel.Category.RESTAURANT
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    12.35,
+                    TransactionModel.Category.OTHER
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    -4.11,
+                    TransactionModel.Category.GROCERIES
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    -1863.1375,
+                    TransactionModel.Category.ELECTRONICS
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    267.170,
+                    TransactionModel.Category.TAXI
+                ),
+            ))
         ),
         bitcoinExchangeRateUSD = 99_999f
     )
     val DataEmptyTransactions = UiState.Data(
         userBalanceBTC = 1.33284293,
-        userTransactions = emptyList(),
+        userTransactions = flowOf(PagingData.from(emptyList())),
         bitcoinExchangeRateUSD = 99_999f
     )
     val DataZeroBitcoin = UiState.Data(
         userBalanceBTC = 0.0,
-        userTransactions = listOf(
-            TransactionModel(
-                LocalDateTime.now(),
-                5.15,
-                TransactionModel.Category.TAXI
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                -246.86938600,
-                TransactionModel.Category.RESTAURANT
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                12.35,
-                TransactionModel.Category.OTHER
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                -4.11,
-                TransactionModel.Category.GROCERIES
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                -1863.1375,
-                TransactionModel.Category.ELECTRONICS
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                267.170,
-                TransactionModel.Category.TAXI
-            ),
+        userTransactions = flowOf(
+            PagingData.from(listOf(
+                TransactionModel(
+                    LocalDateTime.now(),
+                    5.15,
+                    TransactionModel.Category.TAXI
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    -246.86938600,
+                    TransactionModel.Category.RESTAURANT
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    12.35,
+                    TransactionModel.Category.OTHER
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    -4.11,
+                    TransactionModel.Category.GROCERIES
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    -1863.1375,
+                    TransactionModel.Category.ELECTRONICS
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    267.170,
+                    TransactionModel.Category.TAXI
+                ),
+            ))
         ),
         bitcoinExchangeRateUSD = 99_999f
     )
     val DataNoExchangeRate = UiState.Data(
         userBalanceBTC = 598402.327868432,
-        userTransactions = listOf(
-            TransactionModel(
-                LocalDateTime.now(),
-                5.15,
-                TransactionModel.Category.TAXI
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                -246.86938600,
-                TransactionModel.Category.RESTAURANT
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                12.35,
-                TransactionModel.Category.OTHER
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                -4.11,
-                TransactionModel.Category.GROCERIES
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                -1863.1375,
-                TransactionModel.Category.ELECTRONICS
-            ),
-            TransactionModel(
-                LocalDateTime.now(),
-                267.170,
-                TransactionModel.Category.TAXI
-            ),
+        userTransactions = flowOf(
+            PagingData.from(listOf(
+                TransactionModel(
+                    LocalDateTime.now(),
+                    5.15,
+                    TransactionModel.Category.TAXI
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    -246.86938600,
+                    TransactionModel.Category.RESTAURANT
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    12.35,
+                    TransactionModel.Category.OTHER
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    -4.11,
+                    TransactionModel.Category.GROCERIES
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    -1863.1375,
+                    TransactionModel.Category.ELECTRONICS
+                ),
+                TransactionModel(
+                    LocalDateTime.now(),
+                    267.170,
+                    TransactionModel.Category.TAXI
+                ),
+            ))
         ),
         bitcoinExchangeRateUSD = 99_999f
     )
