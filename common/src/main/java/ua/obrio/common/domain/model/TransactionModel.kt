@@ -4,6 +4,7 @@ import ua.obrio.common.presentation.util.transactionDateTimeFormatter
 import java.time.LocalDateTime
 
 data class TransactionModel(
+    val id: Int = 0,
     val dateTime: LocalDateTime,
     val amountBTC: Double,
     val category: Category? = null

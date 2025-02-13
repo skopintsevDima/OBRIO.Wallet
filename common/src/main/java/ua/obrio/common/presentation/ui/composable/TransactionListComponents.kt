@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -58,23 +59,23 @@ fun TransactionsLazyList(
     modifier: Modifier,
     transactions: LazyPagingItems<TransactionModel>
 ) {
-    LazyColumn(modifier = modifier) {
-        items(transactions.itemCount) { index ->
+    val listState = rememberLazyListState()
+
+    LazyColumn(
+        modifier = modifier,
+        state = listState
+    ) {
+        items(
+            count = transactions.itemCount,
+            key = { index -> transactions[index]?.id ?: index }
+        ) { index ->
             transactions[index]?.let { TransactionItem(it) }
         }
 
-        transactions.apply {
-            when (loadState.append) {
-                is LoadState.Loading -> {
-                    item { TransactionsLoader() }
-                }
-
-                is LoadState.Error -> {
-                    item { TransactionsRetryButton { retry() } }
-                }
-
-                is LoadState.NotLoading -> { /*Do nothing*/ }
-            }
+        when (transactions.loadState.append) {
+            is LoadState.Loading -> item { TransactionsLoader() }
+            is LoadState.Error -> item { TransactionsRetryButton { transactions.retry() } }
+            is LoadState.NotLoading -> {} // Do nothing
         }
     }
 }

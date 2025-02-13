@@ -9,6 +9,7 @@ private val dateFormatter = DateTimeFormatter.ISO_DATE_TIME
 
 fun TransactionEntity.toDomain(): TransactionModel {
     return TransactionModel(
+        id = this.id,
         dateTime = LocalDateTime.parse(this.dateTime, dateFormatter),
         amountBTC = this.amountBTC,
         category = this.category?.let { TransactionModel.Category.of(it) }

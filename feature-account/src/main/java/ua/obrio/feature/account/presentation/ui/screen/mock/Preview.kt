@@ -33,31 +33,37 @@ internal object MockUiState {
         userTransactions = flowOf(
             PagingData.from(listOf(
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     5.15,
                     TransactionModel.Category.TAXI
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     -246.86938600,
                     TransactionModel.Category.RESTAURANT
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     12.35,
                     TransactionModel.Category.OTHER
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     -4.11,
                     TransactionModel.Category.GROCERIES
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     -1863.1375,
                     TransactionModel.Category.ELECTRONICS
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     267.170,
                     TransactionModel.Category.TAXI
@@ -76,31 +82,37 @@ internal object MockUiState {
         userTransactions = flowOf(
             PagingData.from(listOf(
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     5.15,
                     TransactionModel.Category.TAXI
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     -246.86938600,
                     TransactionModel.Category.RESTAURANT
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     12.35,
                     TransactionModel.Category.OTHER
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     -4.11,
                     TransactionModel.Category.GROCERIES
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     -1863.1375,
                     TransactionModel.Category.ELECTRONICS
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     267.170,
                     TransactionModel.Category.TAXI
@@ -114,31 +126,37 @@ internal object MockUiState {
         userTransactions = flowOf(
             PagingData.from(listOf(
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     5.15,
                     TransactionModel.Category.TAXI
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     -246.86938600,
                     TransactionModel.Category.RESTAURANT
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     12.35,
                     TransactionModel.Category.OTHER
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     -4.11,
                     TransactionModel.Category.GROCERIES
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     -1863.1375,
                     TransactionModel.Category.ELECTRONICS
                 ),
                 TransactionModel(
+                    1,
                     LocalDateTime.now(),
                     267.170,
                     TransactionModel.Category.TAXI
