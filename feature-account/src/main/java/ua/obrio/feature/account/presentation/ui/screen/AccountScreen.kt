@@ -34,8 +34,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import ua.obrio.common.domain.model.TransactionModel
+import ua.obrio.common.presentation.ui.composable.DataScreenPlaceholder
 import ua.obrio.common.presentation.ui.composable.ErrorSnackBar
 import ua.obrio.common.presentation.ui.composable.LoadingScreen
+import ua.obrio.common.presentation.ui.composable.MessageScreen
 import ua.obrio.common.presentation.ui.composable.TransactionsList
 import ua.obrio.common.presentation.ui.composable.showSnackBarSafe
 import ua.obrio.common.presentation.ui.resources.LocalResources
@@ -87,7 +89,7 @@ private fun ErrorScreen(
     val errorMessage = rememberSaveable(error) { error.errorMsg }
     val actionLabel = stringResource(LocalResources.Strings.Okay)
 
-    LaunchedEffect(errorMessage) {
+    LaunchedEffect(error) {
         snackbarHostState.showSnackBarSafe(
             message = errorMessage,
             actionLabel = actionLabel,
@@ -95,25 +97,17 @@ private fun ErrorScreen(
         )
     }
 
-    // TODO: Handle different errors
-//    when (error) {
-//        is UiState.Error.LoadBookDataError,
-//        is UiState.Error.NoDataForPlayerError -> {
-//            val onRetryClick = remember(viewModel) { { viewModel.tryHandleIntent(UiIntent.FetchBookSummary) } }
-//            DataScreenPlaceholder(onRetryClick)
-//        }
-//
-//        is UiState.Error.PlaybackError,
-//        is UiState.Error.PlayerInitError,
-//        is UiState.Error.UnknownError -> {
-//            MessageScreen(message = stringResource(LocalResources.Strings.UnknownErrorMessage))
-//        }
-//    }
-}
-
-@Composable
-private fun DataScreenPlaceholder(onRetryClick: () -> Unit) {
-
+    when (error) {
+        is UiState.Error.LoadUserAccountError -> {
+            val onRetryClick = remember(viewModel) {
+                { viewModel.tryHandleIntent(UiIntent.LoadAccountRetry) }
+            }
+            DataScreenPlaceholder(onRetryClick)
+        }
+        is UiState.Error.UnknownError -> {
+            MessageScreen(message = stringResource(LocalResources.Strings.UnknownErrorMessage))
+        }
+    }
 }
 
 @Composable

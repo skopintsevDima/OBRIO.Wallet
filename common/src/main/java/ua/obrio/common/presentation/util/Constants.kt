@@ -6,16 +6,19 @@ object Constants {
             const val ERROR_USER_ACCOUNT_NOT_CREATED = 101
             const val ERROR_LOAD_USER_ACCOUNT = 102
             const val ERROR_DEPOSIT_FAILED = 103
+        }
+
+        object AddTransaction {
             const val ERROR_NO_DATA_FOR_TRANSACTION = 104
-            const val ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION = 105 // TODO: Show error for user
-            const val ERROR_INSUFFICIENT_BALANCE = 106 // TODO: Show error for user
-            const val ERROR_MISSING_CATEGORY_FOR_TRANSACTION = 107 // TODO: Show error for user
+            const val ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION = 105
+            const val ERROR_INSUFFICIENT_BALANCE = 106
+            const val ERROR_MISSING_CATEGORY_FOR_TRANSACTION = 107
             const val ERROR_ADDING_TRANSACTION_FAILED = 108
-            const val ERROR_USER_ACCOUNT_UPDATE_FAILED = 109
         }
 
         object Common {
             const val ERROR_UNKNOWN = 100500
+            const val ERROR_USER_ACCOUNT_UPDATE_FAILED = 109
         }
     }
 

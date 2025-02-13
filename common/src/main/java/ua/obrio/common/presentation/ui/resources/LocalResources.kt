@@ -9,7 +9,7 @@ import ua.obrio.common.R
 // TODO: Remove unused, if needed
 object LocalResources {
     object Icons {
-//        val Play = R.drawable.ic_play
+        val Refresh = R.drawable.ic_refresh
     }
 
     object Images {
@@ -30,12 +30,20 @@ object LocalResources {
         val SelectCategory = R.string.select_category
         val Add = R.string.add
 
+        val ErrorLoadUserAccount = R.string.error_load_user_account
+        val ErrorDepositFailed = R.string.error_deposit_failed
+        val ErrorNoData = R.string.error_no_data
+        val ErrorIncorrectAmountForTransaction = R.string.error_incorrect_amount_for_transaction
+        val ErrorInsufficientBalance = R.string.error_insufficient_balance
+        val ErrorMissingCategoryForTransaction = R.string.error_missing_category_for_transaction
+        val ErrorAddingTransactionFailed = R.string.error_adding_transaction_failed
         val ErrorUnknown = R.string.error_unknown
 
         val UnknownErrorMessage = R.string.unknown_error_message_to_user
         val GlobalCrashMessage = R.string.global_crash_message_to_user
         val NoTransactionsMessage = R.string.no_transactions_message
         val LoadingTransactionsFailedMessage = R.string.loading_transactions_failed_message
+        val NoDataErrorMessage = R.string.no_data_message
     }
 
     object Colors {
@@ -91,7 +99,8 @@ object LocalResources {
         }
 
         object Size {
-            val ProgressIndicator = 32.dp
+            val ProgressIndicatorSmall = 32.dp
+            val ProgressIndicatorBig = 96.dp
 
             val BorderWidth = 1.dp
             val ButtonCornerRadius = 8.dp

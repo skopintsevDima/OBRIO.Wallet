@@ -9,7 +9,7 @@ import ua.obrio.common.data.mapper.toEntity
 import ua.obrio.common.data.source.AccountSource
 import ua.obrio.common.domain.model.AccountModel
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_USER_ACCOUNT_NOT_CREATED
-import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_USER_ACCOUNT_UPDATE_FAILED
+import ua.obrio.common.presentation.util.Constants.ErrorCodes.Common.ERROR_USER_ACCOUNT_UPDATE_FAILED
 
 class DbAccountSource(
     private val accountDao: AccountDao

@@ -3,7 +3,7 @@ package ua.obrio.feature.add_transaction.presentation.usecase
 import ua.obrio.common.domain.model.TransactionModel
 import ua.obrio.common.domain.repository.AccountRepository
 import ua.obrio.common.domain.repository.TransactionsRepository
-import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_INSUFFICIENT_BALANCE
+import ua.obrio.common.presentation.util.Constants.ErrorCodes.AddTransaction.ERROR_INSUFFICIENT_BALANCE
 import ua.obrio.feature.add_transaction.domain.usecase.AddTransactionUseCase
 import java.time.LocalDateTime
 

@@ -7,12 +7,16 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import ua.obrio.common.presentation.ui.model.NonCriticalError
+import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
-import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_ADDING_TRANSACTION_FAILED
-import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION
-import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_MISSING_CATEGORY_FOR_TRANSACTION
-import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_NO_DATA_FOR_TRANSACTION
+import ua.obrio.common.presentation.util.Constants.ErrorCodes.AddTransaction.ERROR_ADDING_TRANSACTION_FAILED
+import ua.obrio.common.presentation.util.Constants.ErrorCodes.AddTransaction.ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION
+import ua.obrio.common.presentation.util.Constants.ErrorCodes.AddTransaction.ERROR_INSUFFICIENT_BALANCE
+import ua.obrio.common.presentation.util.Constants.ErrorCodes.AddTransaction.ERROR_MISSING_CATEGORY_FOR_TRANSACTION
+import ua.obrio.common.presentation.util.Constants.ErrorCodes.AddTransaction.ERROR_NO_DATA_FOR_TRANSACTION
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Common.ERROR_UNKNOWN
+import ua.obrio.common.presentation.util.errorCode
 import ua.obrio.feature.add_transaction.domain.usecase.AddTransactionUseCase
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -42,7 +46,7 @@ class AddTransactionViewModelImpl @Inject constructor(
         } catch (e: Throwable) {
             _uiState.value = reduce(
                 _uiState.value,
-                UiResult.Failure(ERROR_UNKNOWN, e.message.toString())
+                UiResult.Failure(e.errorCode(ERROR_UNKNOWN))
             )
         }
     }
@@ -69,29 +73,30 @@ class AddTransactionViewModelImpl @Inject constructor(
 
     private fun addTransaction() {
         viewModelScope.launch(backgroundOpsDispatcher) {
-            val uiResult = _uiState.value.asData?.run {
-                val transactionAmountBTC = strEnteredAmountBTC.toDoubleOrNull()
-                    ?: return@run UiResult.Failure(ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION)
-                val transactionCategory = selectedCategory
-                    ?: return@run UiResult.Failure(ERROR_MISSING_CATEGORY_FOR_TRANSACTION)
+            val uiResult = try {
+                _uiState.value.asData?.run {
+                    val transactionAmountBTC = strEnteredAmountBTC.toDoubleOrNull()
+                        ?: return@run UiResult.Failure(ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION)
+                    val transactionCategory = selectedCategory
+                        ?: return@run UiResult.Failure(ERROR_MISSING_CATEGORY_FOR_TRANSACTION)
 
-                addTransactionUseCase.execute(
-                    transactionDateTime = LocalDateTime.now(),
-                    transactionAmountBTC = transactionAmountBTC,
-                    transactionCategory = transactionCategory
-                ).fold(
-                    onSuccess = { UiResult.Success.TransactionAdded },
-                    onFailure = { UiResult.Failure(ERROR_ADDING_TRANSACTION_FAILED) }
-                )
-            } ?: UiResult.Failure(ERROR_NO_DATA_FOR_TRANSACTION)
-
+                    addTransactionUseCase.execute(
+                        transactionDateTime = LocalDateTime.now(),
+                        transactionAmountBTC = transactionAmountBTC,
+                        transactionCategory = transactionCategory
+                    ).fold(
+                        onSuccess = { UiResult.Success.TransactionAdded },
+                        onFailure = { UiResult.Failure(it.errorCode(ERROR_ADDING_TRANSACTION_FAILED)) }
+                    )
+                } ?: UiResult.Failure(ERROR_NO_DATA_FOR_TRANSACTION)
+            } catch (e: Throwable) {
+                UiResult.Failure(e.errorCode(ERROR_ADDING_TRANSACTION_FAILED))
+            }
             _uiState.value = reduce(_uiState.value, uiResult)
         }
     }
 
     private fun reduce(previousState: UiState, result: UiResult): UiState = when (result) {
-        UiResult.Loading -> UiState.Loading
-
         is UiResult.Success.EnteredAmountUpdated -> previousState.asData?.copy(
             strEnteredAmountBTC = result.strEnteredAmountBTC
         ) ?: previousState
@@ -102,6 +107,28 @@ class AddTransactionViewModelImpl @Inject constructor(
 
         is UiResult.Success.TransactionAdded -> UiState.Finish
 
-        is UiResult.Failure -> result.toError(resourceProvider)
+        is UiResult.Failure -> {
+            val onNonCriticalErrorOccurred = { errorMsg: String ->
+                previousState.asData?.copy(
+                    nonCriticalError = NonCriticalError(errorMsg)
+                ) ?: previousState
+            }
+
+            when (result.errorCode) {
+                ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION -> onNonCriticalErrorOccurred(
+                    resourceProvider.getString(LocalResources.Strings.ErrorIncorrectAmountForTransaction)
+                )
+                ERROR_INSUFFICIENT_BALANCE -> onNonCriticalErrorOccurred(
+                    resourceProvider.getString(LocalResources.Strings.ErrorInsufficientBalance)
+                )
+                ERROR_MISSING_CATEGORY_FOR_TRANSACTION -> onNonCriticalErrorOccurred(
+                    resourceProvider.getString(LocalResources.Strings.ErrorMissingCategoryForTransaction)
+                )
+                ERROR_ADDING_TRANSACTION_FAILED -> onNonCriticalErrorOccurred(
+                    resourceProvider.getString(LocalResources.Strings.ErrorAddingTransactionFailed)
+                )
+                else -> result.toError(resourceProvider)
+            }
+        }
     }
 }

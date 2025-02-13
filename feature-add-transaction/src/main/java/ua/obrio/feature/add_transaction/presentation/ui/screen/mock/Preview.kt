@@ -19,7 +19,6 @@ internal class MockAddTransactionViewModelWithState(
 }
 
 internal object MockUiState {
-    val Loading = UiState.Loading
     val ErrorUnknown = UiState.Error.UnknownError("An unknown error occurred")
     val Data = UiState.Data(
         strEnteredAmountBTC = 3253.2863.toString(),

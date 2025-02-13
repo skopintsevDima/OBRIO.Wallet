@@ -151,7 +151,7 @@ fun TransactionsLoader(modifier: Modifier = Modifier) {
     ) {
         CircularProgressIndicator(
             modifier = Modifier.size(
-                LocalResources.Dimensions.Size.ProgressIndicator
+                LocalResources.Dimensions.Size.ProgressIndicatorSmall
             )
         )
     }

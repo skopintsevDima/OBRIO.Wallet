@@ -5,16 +5,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import ua.obrio.common.presentation.ui.model.NonCriticalError
+import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_DEPOSIT_FAILED
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_LOAD_USER_ACCOUNT
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Common.ERROR_UNKNOWN
+import ua.obrio.common.presentation.util.errorCode
 import ua.obrio.feature.account.domain.usecase.DepositUseCase
 import ua.obrio.feature.account.domain.usecase.GetBitcoinExchangeRateUseCase
 import ua.obrio.feature.account.domain.usecase.GetUserAccountFlowUseCase
@@ -38,19 +41,17 @@ class AccountViewModelImpl @Inject constructor(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     override val uiState: StateFlow<UiState> = _uiState
 
+    private var userAccountUpdatesJob: Job? = null
+
     init {
         observeUserAccountUpdates()
     }
 
     private fun observeUserAccountUpdates() {
-        viewModelScope.launch(backgroundOpsDispatcher) {
-            getUserAccountFlowUseCase.execute()
-                .catch {
-                    _uiState.value = reduce(
-                        _uiState.value,
-                        UiResult.Failure(ERROR_LOAD_USER_ACCOUNT, it.message.toString())
-                    )
-                }.collectLatest { userAccount ->
+        userAccountUpdatesJob?.cancel()
+        userAccountUpdatesJob = viewModelScope.launch(backgroundOpsDispatcher) {
+            try {
+                getUserAccountFlowUseCase.execute().collectLatest { userAccount ->
                     val bitcoinExchangeRateUSD = runCatching {
                         getBitcoinExchangeRateUseCase.execute()
                     }.getOrElse { Float.NaN }
@@ -65,6 +66,12 @@ class AccountViewModelImpl @Inject constructor(
                     )
                     _uiState.value = reduce(_uiState.value, uiResult)
                 }
+            } catch (e: Throwable){
+                _uiState.value = reduce(
+                    _uiState.value,
+                    UiResult.Failure(e.errorCode(ERROR_LOAD_USER_ACCOUNT))
+                )
+            }
         }
     }
 
@@ -74,25 +81,19 @@ class AccountViewModelImpl @Inject constructor(
         } catch (e: Throwable) {
             _uiState.value = reduce(
                 _uiState.value,
-                UiResult.Failure(ERROR_UNKNOWN, e.message.toString())
+                UiResult.Failure(e.errorCode(ERROR_UNKNOWN))
             )
         }
     }
 
     private fun handleIntent(intent: UiIntent) {
         when (intent) {
-            is UiIntent.Deposit -> {
-                viewModelScope.launch(backgroundOpsDispatcher) {
-                    _uiState.value = reduce(_uiState.value, UiResult.Loading)
-                    deposit(intent.amountBTC)
-                }
-            }
+            is UiIntent.LoadAccountRetry -> observeUserAccountUpdates()
+            is UiIntent.Deposit -> deposit(intent.amountBTC)
         }
     }
 
     private fun reduce(previousState: UiState, result: UiResult): UiState = when (result) {
-        UiResult.Loading -> UiState.Loading
-
         is UiResult.Success.ScreenDataUpdated -> {
             UiState.Data(
                 userBalanceBTC = result.userAccount.currentBalanceBTC,
@@ -101,26 +102,40 @@ class AccountViewModelImpl @Inject constructor(
             )
         }
 
-        is UiResult.Failure -> result.toError(resourceProvider)
+        is UiResult.Failure -> {
+            val onNonCriticalErrorOccurred = { errorMsg: String ->
+                previousState.asData?.copy(
+                    nonCriticalError = NonCriticalError(errorMsg)
+                ) ?: previousState
+            }
+
+            when (result.errorCode) {
+                ERROR_DEPOSIT_FAILED -> onNonCriticalErrorOccurred(
+                    resourceProvider.getString(LocalResources.Strings.ErrorDepositFailed)
+                )
+                else -> result.toError(resourceProvider)
+            }
+        }
     }
 
-    private suspend fun deposit(depositAmountBTC: Double) {
-        val depositFailed = { errorMsg: String -> _uiState.value = reduce(
-            _uiState.value,
-            UiResult.Failure(ERROR_DEPOSIT_FAILED, errorMsg)
-        )}
+    private fun deposit(depositAmountBTC: Double) {
+        viewModelScope.launch(backgroundOpsDispatcher) {
+            val depositFailed = { error: Throwable -> _uiState.value = reduce(_uiState.value,
+                UiResult.Failure(error.errorCode(ERROR_DEPOSIT_FAILED))
+            )}
 
-        try {
-            val depositResult = depositUseCase.execute(depositAmountBTC)
+            try {
+                val depositResult = depositUseCase.execute(depositAmountBTC)
 
-            depositResult.fold(
-                onSuccess = {
-                    // TODO: Show success message to the user (as a side effect/UiEvent)
-                },
-                onFailure = { depositFailed(it.message.toString()) }
-            )
-        } catch (e: Throwable) {
-            depositFailed(e.message.toString())
+                depositResult.fold(
+                    onSuccess = {
+                        // TODO: Show success message to the user (as a side effect/UiEvent)
+                    },
+                    onFailure = { depositFailed(it) }
+                )
+            } catch (e: Throwable) {
+                depositFailed(e)
+            }
         }
     }
 }

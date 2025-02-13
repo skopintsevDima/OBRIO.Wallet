@@ -23,7 +23,7 @@ fun MessageScreen(message: String) {
     ) {
         Text(
             text = message,
-            style = MaterialTheme.typography.bodySmall.copy(
+            style = MaterialTheme.typography.bodyMedium.copy(
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = LocalResources.Dimensions.Text.SizeLarge
             ),

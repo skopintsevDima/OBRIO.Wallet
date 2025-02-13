@@ -37,17 +37,17 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ua.obrio.common.domain.model.TransactionModel
 import ua.obrio.common.presentation.ui.composable.ErrorSnackBar
-import ua.obrio.common.presentation.ui.composable.LoadingScreen
+import ua.obrio.common.presentation.ui.composable.MessageScreen
 import ua.obrio.common.presentation.ui.composable.showSnackBarSafe
 import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.theme.OBRIOWalletTheme
 import ua.obrio.common.presentation.ui.util.PreviewLightDarkBothOrientations
+import ua.obrio.common.presentation.util.Constants.UI.Account
 import ua.obrio.common.presentation.util.Constants.UI.AddTransaction
 import ua.obrio.common.presentation.util.isValidDoubleOrEmpty
 import ua.obrio.feature.add_transaction.presentation.ui.screen.mock.DataStatePreviewProvider
 import ua.obrio.feature.add_transaction.presentation.ui.screen.mock.ErrorStatePreviewProvider
 import ua.obrio.feature.add_transaction.presentation.ui.screen.mock.MockAddTransactionViewModelWithState
-import ua.obrio.feature.add_transaction.presentation.ui.screen.mock.MockUiState
 
 @Composable
 fun AddTransactionScreen(
@@ -70,8 +70,7 @@ fun AddTransactionScreen(
                 .padding(paddingValues)
         ) {
             when (val stateValue = uiState.value) {
-                UiState.Loading -> LoadingScreen()
-                is UiState.Error -> ErrorScreen(stateValue, viewModel, snackbarHostState)
+                is UiState.Error -> ErrorScreen(stateValue, snackbarHostState)
                 is UiState.Data -> DataScreen(stateValue, viewModel, snackbarHostState)
                 UiState.Finish -> { /*Do nothing*/ }
             }
@@ -82,39 +81,27 @@ fun AddTransactionScreen(
 @Composable
 private fun ErrorScreen(
     error: UiState.Error,
-    viewModel: AddTransactionViewModel,
     snackbarHostState: SnackbarHostState
 ) {
     val errorMessage = rememberSaveable(error) { error.errorMsg }
     val actionLabel = stringResource(LocalResources.Strings.Okay)
 
-    LaunchedEffect(errorMessage) {
+    LaunchedEffect(error) {
         snackbarHostState.showSnackBarSafe(
             message = errorMessage,
             actionLabel = actionLabel,
-            loggingTag = AddTransaction.TAG
+            loggingTag = Account.TAG
         )
     }
 
-    // TODO: Handle different errors
-//    when (error) {
-//        is UiState.Error.LoadBookDataError,
-//        is UiState.Error.NoDataForPlayerError -> {
-//            val onRetryClick = remember(viewModel) { { viewModel.tryHandleIntent(UiIntent.FetchBookSummary) } }
-//            DataScreenPlaceholder(onRetryClick)
-//        }
-//
-//        is UiState.Error.PlaybackError,
-//        is UiState.Error.PlayerInitError,
-//        is UiState.Error.UnknownError -> {
-//            MessageScreen(message = stringResource(LocalResources.Strings.UnknownErrorMessage))
-//        }
-//    }
-}
-
-@Composable
-private fun DataScreenPlaceholder(onRetryClick: () -> Unit) {
-
+    when (error) {
+        is UiState.Error.NoDataError -> {
+            MessageScreen(message = stringResource(LocalResources.Strings.NoDataErrorMessage))
+        }
+        is UiState.Error.UnknownError -> {
+            MessageScreen(message = stringResource(LocalResources.Strings.UnknownErrorMessage))
+        }
+    }
 }
 
 @Composable
@@ -232,12 +219,6 @@ private fun TransactionCategory(
             modifier = Modifier.padding(start = LocalResources.Dimensions.Padding.Small)
         )
     }
-}
-
-@PreviewLightDarkBothOrientations
-@Composable
-private fun LoadingPreview() {
-    AddTransactionScreenPreviewWrapper(MockUiState.Loading)
 }
 
 @PreviewLightDarkBothOrientations

@@ -7,6 +7,7 @@ import ua.obrio.common.domain.model.TransactionModel
 import ua.obrio.common.presentation.ui.model.NonCriticalError
 import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
+import ua.obrio.common.presentation.util.Constants.ErrorCodes
 
 sealed class UiState {
     data object Loading: UiState()
@@ -18,8 +19,12 @@ sealed class UiState {
         val nonCriticalError: NonCriticalError? = null
     ): UiState()
 
-    sealed class Error(val errorMsg: String): UiState() {
-        data class UnknownError(val msg: String): Error(msg)
+    sealed class Error(
+        val errorMsg: String,
+        val timestamp: Long
+    ): UiState() {
+        data class LoadUserAccountError(val msg: String): Error(msg, System.currentTimeMillis())
+        data class UnknownError(val msg: String): Error(msg, System.currentTimeMillis())
     }
 
     val asData: Data?
@@ -27,12 +32,11 @@ sealed class UiState {
 }
 
 sealed class UiIntent {
+    data object LoadAccountRetry: UiIntent()
     data class Deposit(val amountBTC: Double): UiIntent()
 }
 
 sealed class UiResult {
-    data object Loading: UiResult()
-
     sealed class Success: UiResult() {
         data class ScreenDataUpdated(
             val userAccount: AccountModel,
@@ -41,8 +45,14 @@ sealed class UiResult {
         ): Success()
     }
 
-    data class Failure(val errorCode: Int, val errorMsg: String = ""): UiResult() {
+    data class Failure(
+        val errorCode: Int,
+        val errorMsg: String = ""
+    ): UiResult() {
         fun toError(resourceProvider: ResourceProvider): UiState.Error = when (errorCode) {
+            ErrorCodes.Account.ERROR_LOAD_USER_ACCOUNT -> UiState.Error.LoadUserAccountError(
+                resourceProvider.getString(LocalResources.Strings.ErrorLoadUserAccount)
+            )
             else -> UiState.Error.UnknownError(
                 resourceProvider.getString(LocalResources.Strings.ErrorUnknown)
             )
