@@ -60,6 +60,10 @@ fun AccountScreen(
     val uiState = viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(viewModel) {
+        viewModel.tryHandleIntent(UiIntent.LoadUserAccount)
+    }
+
     Scaffold(snackbarHost = { ErrorSnackBar(snackbarHostState) }) { paddingValues ->
         Box(
             modifier = Modifier
@@ -100,7 +104,7 @@ private fun ErrorScreen(
     when (error) {
         is UiState.Error.LoadUserAccountError -> {
             val onRetryClick = remember(viewModel) {
-                { viewModel.tryHandleIntent(UiIntent.LoadAccountRetry) }
+                { viewModel.tryHandleIntent(UiIntent.LoadUserAccount) }
             }
             DataScreenPlaceholder(onRetryClick)
         }

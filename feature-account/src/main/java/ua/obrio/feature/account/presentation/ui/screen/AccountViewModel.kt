@@ -43,10 +43,6 @@ class AccountViewModelImpl @Inject constructor(
 
     private var userAccountUpdatesJob: Job? = null
 
-    init {
-        observeUserAccountUpdates()
-    }
-
     private fun observeUserAccountUpdates() {
         userAccountUpdatesJob?.cancel()
         userAccountUpdatesJob = viewModelScope.launch(backgroundOpsDispatcher) {
@@ -88,7 +84,7 @@ class AccountViewModelImpl @Inject constructor(
 
     private fun handleIntent(intent: UiIntent) {
         when (intent) {
-            is UiIntent.LoadAccountRetry -> observeUserAccountUpdates()
+            is UiIntent.LoadUserAccount -> observeUserAccountUpdates()
             is UiIntent.Deposit -> deposit(intent.amountBTC)
         }
     }

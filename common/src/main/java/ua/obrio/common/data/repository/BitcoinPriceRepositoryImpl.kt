@@ -1,10 +1,12 @@
 package ua.obrio.common.data.repository
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import ua.obrio.common.data.source.BitcoinPriceSource
 import ua.obrio.common.data.source.BitcoinPriceStorage
@@ -25,7 +27,10 @@ class BitcoinPriceRepositoryImpl(
 
     private suspend fun refreshPriceIfNeeded() {
         if (isPriceUpdateRequired()) {
-            val upToDateBitcoinPriceUSD = bitcoinPriceSource.getPriceUSD()
+            val upToDateBitcoinPriceUSD = runCatching { bitcoinPriceSource.getPriceUSD() }.fold(
+                onSuccess = { it },
+                onFailure = { bitcoinPriceStorage.getPriceUSD() }
+            )
             bitcoinPriceStorage.savePrice(upToDateBitcoinPriceUSD)
 
             isNewSession = false
@@ -41,18 +46,27 @@ class BitcoinPriceRepositoryImpl(
     }
 
     private suspend fun savePriceLastUpdateTime(lastUpdateTime: Long) {
-        dataStore.edit { preferences ->
-            preferences[KEY_LAST_UPDATE] = lastUpdateTime
+        runCatching {
+            dataStore.edit { preferences ->
+                preferences[KEY_LAST_UPDATE] = lastUpdateTime
+            }
         }
     }
 
     private suspend fun getPriceLastUpdateTime(): Long {
-        return dataStore.data.map { preferences ->
-            preferences[KEY_LAST_UPDATE] ?: 0
-        }.first()
+        return runCatching {
+            dataStore.data
+                .catch { Log.d(TAG, "getPriceLastUpdateTime error: $it") }
+                .map { preferences -> preferences[KEY_LAST_UPDATE] ?: LAST_UPDATE_DEFAULT_VALUE }
+        }.fold(
+            onSuccess = { it.firstOrNull() ?: LAST_UPDATE_DEFAULT_VALUE },
+            onFailure = { LAST_UPDATE_DEFAULT_VALUE }
+        )
     }
 
     companion object {
-        private val KEY_LAST_UPDATE = longPreferencesKey("KEY_LAST_UPDATE")
+        private const val LAST_UPDATE_DEFAULT_VALUE = 0L
+        private val TAG = BitcoinPriceRepositoryImpl::class.simpleName
+        internal val KEY_LAST_UPDATE = longPreferencesKey("KEY_LAST_UPDATE")
     }
 }

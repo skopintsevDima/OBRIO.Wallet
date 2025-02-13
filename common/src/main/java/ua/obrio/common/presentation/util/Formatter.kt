@@ -5,22 +5,22 @@ import java.math.BigDecimal
 import java.math.MathContext
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.absoluteValue
 
 val transactionDateTimeFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern(FORMAT_TRANSACTION_DATE_TIME)
 
 fun formatBalanceBTC(balanceBTC: Double): String {
-    val stringFormat = when {
-        balanceBTC >= 100000 -> "%.0f"
-        balanceBTC >= 10000 -> "%.1f"
-        balanceBTC >= 1000 -> "%.2f"
-        else -> "%.5g"
-    }
-    return String.format(
-        Locale.getDefault(),
-        stringFormat,
-        balanceBTC
-    )
+    val balanceBTCFormatted = BigDecimal(balanceBTC, MathContext.DECIMAL64)
+        .stripTrailingZeros()
+        .toPlainString()
+    return if (balanceBTC.absoluteValue >= 1) {
+        String.format(
+            Locale.getDefault(),
+            "%.2f",
+            balanceBTC
+        )
+    } else balanceBTCFormatted
 }
 
 fun formatTransactionBTC(transactionBTC: Double): String {

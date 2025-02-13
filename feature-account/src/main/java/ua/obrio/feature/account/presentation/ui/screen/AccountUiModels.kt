@@ -39,7 +39,7 @@ sealed class UiState {
 }
 
 sealed class UiIntent {
-    data object LoadAccountRetry: UiIntent()
+    data object LoadUserAccount: UiIntent()
     data class Deposit(val amountBTC: Double): UiIntent()
 }
 
