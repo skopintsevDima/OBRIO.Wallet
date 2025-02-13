@@ -75,7 +75,7 @@ class AddTransactionViewModelImpl @Inject constructor(
         viewModelScope.launch(backgroundOpsDispatcher) {
             val uiResult = try {
                 _uiState.value.asData?.run {
-                    val transactionAmountBTC = strEnteredAmountBTC.toDoubleOrNull()
+                    val transactionAmountBTC = strEnteredAmountBTC.toDoubleOrNull()?.takeIf { it > 0 }
                         ?: return@run UiResult.Failure(ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION)
                     val transactionCategory = selectedCategory
                         ?: return@run UiResult.Failure(ERROR_MISSING_CATEGORY_FOR_TRANSACTION)
