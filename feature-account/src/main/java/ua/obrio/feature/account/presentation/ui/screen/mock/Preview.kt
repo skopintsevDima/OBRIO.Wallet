@@ -23,6 +23,7 @@ internal class MockAccountViewModelWithState(
 
 internal object MockUiState {
     val Loading = UiState.Loading
+    val ErrorLoadAccount = UiState.Error.LoadUserAccountError("Loading user account failed")
     val ErrorUnknown = UiState.Error.UnknownError("An unknown error occurred")
     val Data = UiState.Data(
         userBalanceBTC = 100.32765,
@@ -148,7 +149,7 @@ internal object MockUiState {
 internal class ErrorStatePreviewProvider : PreviewParameterProvider<UiState.Error> {
     override val values = sequenceOf(
         MockUiState.ErrorUnknown,
-        // TODO: Add more errors
+        MockUiState.ErrorLoadAccount
     )
 }
 

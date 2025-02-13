@@ -19,6 +19,7 @@ internal class MockAddTransactionViewModelWithState(
 }
 
 internal object MockUiState {
+    val ErrorNoData = UiState.Error.NoDataError("No data found")
     val ErrorUnknown = UiState.Error.UnknownError("An unknown error occurred")
     val Data = UiState.Data(
         strEnteredAmountBTC = 3253.2863.toString(),
@@ -37,7 +38,7 @@ internal object MockUiState {
 internal class ErrorStatePreviewProvider : PreviewParameterProvider<UiState.Error> {
     override val values = sequenceOf(
         MockUiState.ErrorUnknown,
-        // TODO: Add more errors
+        MockUiState.ErrorNoData
     )
 }
 

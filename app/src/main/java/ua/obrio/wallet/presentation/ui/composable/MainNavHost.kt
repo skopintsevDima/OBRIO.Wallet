@@ -18,7 +18,6 @@ fun MainNavHost(
     navController: NavHostController = rememberNavController(),
     padding: PaddingValues
 ) {
-    // TODO: Check, if navigation works correctly: no screen duplication in backstack
     NavHost(
         navController = navController,
         startDestination = Account.ROUTE_ID,
