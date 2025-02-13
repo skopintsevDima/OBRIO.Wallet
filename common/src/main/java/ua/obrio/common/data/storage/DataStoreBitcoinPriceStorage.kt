@@ -1,4 +1,4 @@
-package ua.obrio.common.data.storage.source
+package ua.obrio.common.data.storage
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

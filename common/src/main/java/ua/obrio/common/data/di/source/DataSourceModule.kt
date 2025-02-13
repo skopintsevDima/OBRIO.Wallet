@@ -16,7 +16,7 @@ import ua.obrio.common.data.source.BitcoinPriceSource
 import ua.obrio.common.data.api.source.ApiBitcoinPriceSource
 import ua.obrio.common.data.source.BitcoinPriceStorage
 import ua.obrio.common.data.source.TransactionsSource
-import ua.obrio.common.data.storage.source.DataStoreBitcoinPriceStorage
+import ua.obrio.common.data.storage.DataStoreBitcoinPriceStorage
 import ua.obrio.common.data.util.dataStore
 import javax.inject.Singleton
 
