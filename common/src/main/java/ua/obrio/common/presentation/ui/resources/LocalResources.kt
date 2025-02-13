@@ -51,6 +51,10 @@ object LocalResources {
         val Red = Color.Red
     }
 
+    object TextLabel {
+        val TransactionAmountWidthMax = 200.dp
+    }
+
     object Dimensions {
         object Padding {
             val Tiny = 4.dp

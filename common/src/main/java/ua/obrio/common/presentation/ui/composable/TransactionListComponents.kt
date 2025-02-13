@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Button
@@ -29,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import ua.obrio.common.domain.model.TransactionModel
@@ -176,10 +178,13 @@ fun TransactionItem(transaction: TransactionModel) {
             )
         }
         Text(
+            modifier = Modifier.widthIn(max = LocalResources.TextLabel.TransactionAmountWidthMax),
             text = formatTransactionBTC(transaction.amountBTC),
             fontSize = LocalResources.Dimensions.Text.SizeMedium,
             color = if (transaction.amountBTC > 0) Color.Green else Color.Red,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

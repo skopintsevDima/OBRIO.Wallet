@@ -17,7 +17,7 @@ fun formatBalanceBTC(balanceBTC: Double): String {
     return if (balanceBTC.absoluteValue >= 1) {
         String.format(
             Locale.getDefault(),
-            "%.2f",
+            "%.3f",
             balanceBTC
         )
     } else balanceBTCFormatted
