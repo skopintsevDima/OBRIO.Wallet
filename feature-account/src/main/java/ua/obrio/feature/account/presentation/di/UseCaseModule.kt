@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ua.obrio.common.domain.repository.AccountRepository
+import ua.obrio.common.domain.repository.BitcoinPriceRepository
 import ua.obrio.common.domain.repository.TransactionsRepository
 import ua.obrio.feature.account.domain.usecase.DepositUseCase
 import ua.obrio.feature.account.domain.usecase.GetBitcoinExchangeRateUseCase
@@ -31,8 +32,11 @@ class UseCaseModule {
     )
 
     @Provides
-    fun provideGetBitcoinExchangeRateUseCase(): GetBitcoinExchangeRateUseCase =
-        GetBitcoinExchangeRateUseCaseImpl()
+    fun provideGetBitcoinExchangeRateUseCase(
+        bitcoinPriceRepository: BitcoinPriceRepository
+    ): GetBitcoinExchangeRateUseCase = GetBitcoinExchangeRateUseCaseImpl(
+        bitcoinPriceRepository
+    )
 
     @Provides
     fun provideDepositUseCase(

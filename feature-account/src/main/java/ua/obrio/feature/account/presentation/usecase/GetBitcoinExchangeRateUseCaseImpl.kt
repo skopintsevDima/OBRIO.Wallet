@@ -1,11 +1,12 @@
 package ua.obrio.feature.account.presentation.usecase
 
-import kotlinx.coroutines.delay
+import ua.obrio.common.domain.repository.BitcoinPriceRepository
 import ua.obrio.feature.account.domain.usecase.GetBitcoinExchangeRateUseCase
 
-class GetBitcoinExchangeRateUseCaseImpl : GetBitcoinExchangeRateUseCase {
+class GetBitcoinExchangeRateUseCaseImpl(
+    private val bitcoinPriceRepository: BitcoinPriceRepository
+): GetBitcoinExchangeRateUseCase {
     override suspend fun execute(): Float {
-        delay(500L) // TODO: Remove
-        return 96_874f
+        return bitcoinPriceRepository.getPriceUSD()
     }
 }

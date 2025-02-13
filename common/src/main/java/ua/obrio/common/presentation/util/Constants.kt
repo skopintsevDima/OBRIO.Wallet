@@ -23,6 +23,16 @@ object Constants {
         const val DATABASE_VERSION = 1
     }
 
+    object Network {
+        const val COIN_GECKO_BASE_URL = "https://api.coingecko.com/api/v3/"
+        const val COIN_GECKO_BTC_USD_REQUEST_URL = "simple/price?ids=bitcoin&vs_currencies=usd"
+    }
+
+    object Storage {
+        const val DATA_STORE_NAME = "wallet_storage"
+        const val BTC_PRICE_REFRESH_TIME_LIMIT_SEC = 3600
+    }
+
     object UI {
         object Common {
             const val FORMAT_TRANSACTION_DATE_TIME = "MMM dd, yyyy HH:mm"

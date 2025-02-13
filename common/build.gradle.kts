@@ -47,6 +47,10 @@ dependencies {
     api(libs.paging.runtime)
     api(libs.paging.compose)
 
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.datastore)
+
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     implementation(libs.room.paging)
