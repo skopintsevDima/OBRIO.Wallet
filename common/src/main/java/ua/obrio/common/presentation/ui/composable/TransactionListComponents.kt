@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -19,6 +19,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,11 +61,9 @@ fun TransactionsLazyList(
     modifier: Modifier,
     transactions: LazyPagingItems<TransactionModel>
 ) {
-    val listState = rememberLazyListState()
-
     LazyColumn(
         modifier = modifier,
-        state = listState
+        state = rememberForeverLazyListState(key = "transactions")
     ) {
         items(
             count = transactions.itemCount,
@@ -78,6 +78,41 @@ fun TransactionsLazyList(
             is LoadState.NotLoading -> {} // Do nothing
         }
     }
+}
+
+private val SaveMap = mutableMapOf<String, KeyParams>()
+
+private data class KeyParams(
+    val params: String = "",
+    val index: Int,
+    val scrollOffset: Int
+)
+
+@Composable
+private fun rememberForeverLazyListState(
+    key: String,
+    params: String = "",
+    initialFirstVisibleItemIndex: Int = 0,
+    initialFirstVisibleItemScrollOffset: Int = 0
+): LazyListState {
+    val scrollState = remember {
+        var savedValue = SaveMap[key]
+        if (savedValue?.params != params) savedValue = null
+        val savedIndex = savedValue?.index ?: initialFirstVisibleItemIndex
+        val savedOffset = savedValue?.scrollOffset ?: initialFirstVisibleItemScrollOffset
+        LazyListState(
+            savedIndex,
+            savedOffset
+        )
+    }
+    DisposableEffect(scrollState) {
+        onDispose {
+            val lastIndex = scrollState.firstVisibleItemIndex
+            val lastOffset = scrollState.firstVisibleItemScrollOffset
+            SaveMap[key] = KeyParams(params, lastIndex, lastOffset)
+        }
+    }
+    return scrollState
 }
 
 @Composable
