@@ -29,7 +29,7 @@ internal object MockUiState {
     val ErrorLoadAccount = UiState.Error.LoadUserAccountError("Loading user account failed")
     val ErrorUnknown = UiState.Error.UnknownError("An unknown error occurred")
     val Data = UiState.Data(
-        userBalanceBTC = 100.32765,
+        userBalanceBTC = 3986872377862.365,
         userTransactions = flowOf(
             PagingData.from(listOf(
                 TransactionModel(

@@ -198,6 +198,7 @@ fun DataPortraitScreen(
         ) {
             val formattedBalanceBTC = formatBalanceBTC(balanceBTC)
             Text(
+                modifier = Modifier.weight(1f),
                 text = stringResource(LocalResources.Strings.BalanceInBTC, formattedBalanceBTC),
                 fontSize = LocalResources.Dimensions.Text.SizeLarge,
                 fontWeight = FontWeight.Bold
@@ -276,6 +277,7 @@ private fun DataLandscapeScreen(
             ) {
                 val formattedBalanceBTC = formatBalanceBTC(balanceBTC)
                 Text(
+                    modifier = Modifier.weight(1f),
                     text = stringResource(LocalResources.Strings.BalanceInBTC, formattedBalanceBTC),
                     fontSize = LocalResources.Dimensions.Text.SizeLarge,
                     fontWeight = FontWeight.Bold
