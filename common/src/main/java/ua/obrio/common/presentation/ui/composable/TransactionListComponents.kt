@@ -65,7 +65,7 @@ fun TransactionsLazyList(
 ) {
     LazyColumn(
         modifier = modifier,
-        state = rememberForeverLazyListState(key = "transactions")
+        state = rememberForeverLazyListState(key = "transactions" + transactions[0]?.id)
     ) {
         items(
             count = transactions.itemCount,
