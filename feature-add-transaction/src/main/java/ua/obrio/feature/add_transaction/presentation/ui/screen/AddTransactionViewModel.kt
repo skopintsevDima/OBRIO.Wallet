@@ -76,9 +76,9 @@ class AddTransactionViewModelImpl @Inject constructor(
                     ?: return@run UiResult.Failure(ERROR_MISSING_CATEGORY_FOR_TRANSACTION)
 
                 addTransactionUseCase.execute(
-                    dateTime = LocalDateTime.now(),
-                    amountBTC = -transactionAmountBTC,
-                    category = transactionCategory
+                    transactionDateTime = LocalDateTime.now(),
+                    transactionAmountBTC = transactionAmountBTC,
+                    transactionCategory = transactionCategory
                 ).fold(
                     onSuccess = { UiResult.Success.TransactionAdded },
                     onFailure = { UiResult.Failure(ERROR_ADDING_TRANSACTION_FAILED) }

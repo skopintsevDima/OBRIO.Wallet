@@ -3,6 +3,7 @@ package ua.obrio.feature.add_transaction.presentation.usecase
 import ua.obrio.common.domain.model.TransactionModel
 import ua.obrio.common.domain.repository.AccountRepository
 import ua.obrio.common.domain.repository.TransactionsRepository
+import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_INSUFFICIENT_BALANCE
 import ua.obrio.feature.add_transaction.domain.usecase.AddTransactionUseCase
 import java.time.LocalDateTime
 
@@ -11,17 +12,21 @@ class AddTransactionUseCaseImpl(
     private val transactionsRepository: TransactionsRepository
 ): AddTransactionUseCase {
     override suspend fun execute(
-        dateTime: LocalDateTime,
-        amountBTC: Double,
-        category: TransactionModel.Category?
+        transactionDateTime: LocalDateTime,
+        transactionAmountBTC: Double,
+        transactionCategory: TransactionModel.Category?
     ): Result<Unit> {
+        val userAccount = accountRepository.getUserAccount()
+        if (transactionAmountBTC > userAccount.currentBalanceBTC) {
+            return Result.failure(Throwable(ERROR_INSUFFICIENT_BALANCE.toString()))
+        }
+
         val transaction = TransactionModel(
-            dateTime = dateTime,
-            amountBTC = amountBTC,
-            category = category
+            dateTime = transactionDateTime,
+            amountBTC = -transactionAmountBTC,
+            category = transactionCategory
         )
 
-        val userAccount = accountRepository.getUserAccount()
         val updatedBalanceBTC = userAccount.currentBalanceBTC + transaction.amountBTC
         val updateUserResult = accountRepository.updateUserAccount(
             updatedBalanceBTC = updatedBalanceBTC

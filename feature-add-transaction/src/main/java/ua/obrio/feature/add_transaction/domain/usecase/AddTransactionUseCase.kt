@@ -5,8 +5,8 @@ import java.time.LocalDateTime
 
 interface AddTransactionUseCase {
     suspend fun execute(
-        dateTime: LocalDateTime,
-        amountBTC: Double,
-        category: TransactionModel.Category?
+        transactionDateTime: LocalDateTime,
+        transactionAmountBTC: Double,
+        transactionCategory: TransactionModel.Category?
     ): Result<Unit>
 }
