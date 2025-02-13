@@ -220,7 +220,10 @@ fun DataPortraitScreen(
     if (showDepositDialog) {
         DepositDialog(
             onDismiss = { showDepositDialog = false },
-            onConfirm = onDepositConfirmed
+            onConfirm = {
+                depositAmountBTC -> onDepositConfirmed(depositAmountBTC)
+                showDepositDialog = false
+            }
         )
     }
 }
@@ -297,7 +300,10 @@ private fun DataLandscapeScreen(
     if (showDepositDialog) {
         DepositDialog(
             onDismiss = { showDepositDialog = false },
-            onConfirm = onDepositConfirmed
+            onConfirm = {
+                depositAmountBTC -> onDepositConfirmed(depositAmountBTC)
+                showDepositDialog = false
+            }
         )
     }
 }

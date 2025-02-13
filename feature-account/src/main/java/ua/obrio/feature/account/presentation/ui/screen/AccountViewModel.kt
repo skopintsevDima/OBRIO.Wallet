@@ -84,7 +84,7 @@ class AccountViewModelImpl @Inject constructor(
             is UiIntent.Deposit -> {
                 viewModelScope.launch(backgroundOpsDispatcher) {
                     _uiState.value = reduce(_uiState.value, UiResult.Loading)
-                    _uiState.value = reduce(_uiState.value, deposit(intent.amountBTC))
+                    deposit(intent.amountBTC)
                 }
             }
         }
@@ -101,24 +101,26 @@ class AccountViewModelImpl @Inject constructor(
             )
         }
 
-        is UiResult.Success.DepositSucceeded -> {
-            // TODO: Show success message to the user (as a side effect/UiEvent)
-            previousState
-        }
-
         is UiResult.Failure -> result.toError(resourceProvider)
     }
 
-    private suspend fun deposit(depositAmountBTC: Double): UiResult {
+    private suspend fun deposit(depositAmountBTC: Double) {
+        val depositFailed = { errorMsg: String -> _uiState.value = reduce(
+            _uiState.value,
+            UiResult.Failure(ERROR_DEPOSIT_FAILED, errorMsg)
+        )}
+
         try {
             val depositResult = depositUseCase.execute(depositAmountBTC)
 
-            return depositResult.fold(
-                onSuccess = { UiResult.Success.DepositSucceeded },
-                onFailure = { UiResult.Failure(ERROR_DEPOSIT_FAILED, it.message.toString()) }
+            depositResult.fold(
+                onSuccess = {
+                    // TODO: Show success message to the user (as a side effect/UiEvent)
+                },
+                onFailure = { depositFailed(it.message.toString()) }
             )
         } catch (e: Throwable) {
-            return UiResult.Failure(ERROR_DEPOSIT_FAILED, e.message.toString())
+            depositFailed(e.message.toString())
         }
     }
 }

@@ -39,8 +39,6 @@ sealed class UiResult {
             val userTransactionsPaged: Flow<PagingData<TransactionModel>>,
             val bitcoinExchangeRateUSD: Float
         ): Success()
-
-        data object DepositSucceeded: Success()
     }
 
     data class Failure(val errorCode: Int, val errorMsg: String = ""): UiResult() {
