@@ -23,8 +23,15 @@ sealed class UiState {
         val errorMsg: String,
         val timestamp: Long
     ): UiState() {
-        data class LoadUserAccountError(val msg: String): Error(msg, System.currentTimeMillis())
-        data class UnknownError(val msg: String): Error(msg, System.currentTimeMillis())
+        data class LoadUserAccountError(
+            val msg: String,
+            val ts: Long = System.currentTimeMillis()
+        ): Error(msg, ts)
+
+        data class UnknownError(
+            val msg: String,
+            val ts: Long = System.currentTimeMillis()
+        ): Error(msg, ts)
     }
 
     val asData: Data?

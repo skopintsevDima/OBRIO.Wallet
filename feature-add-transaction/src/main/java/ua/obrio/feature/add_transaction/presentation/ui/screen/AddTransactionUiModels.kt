@@ -17,8 +17,15 @@ sealed class UiState {
         val errorMsg: String,
         val timestamp: Long
     ): UiState() {
-        data class NoDataError(val msg: String): Error(msg, System.currentTimeMillis())
-        data class UnknownError(val msg: String): Error(msg, System.currentTimeMillis())
+        data class NoDataError(
+            val msg: String,
+            val ts: Long = System.currentTimeMillis()
+        ): Error(msg, ts)
+
+        data class UnknownError(
+            val msg: String,
+            val ts: Long = System.currentTimeMillis()
+        ): Error(msg, ts)
     }
 
     data object Finish: UiState()
