@@ -66,3 +66,7 @@ sealed class UiResult {
         }
     }
 }
+
+sealed class UiEvent {
+    data object DepositSucceeded: UiEvent()
+}

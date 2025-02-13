@@ -1,6 +1,7 @@
 package ua.obrio.feature.account.presentation.ui.screen
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -62,6 +64,21 @@ fun AccountScreen(
 
     LaunchedEffect(viewModel) {
         viewModel.tryHandleIntent(UiIntent.LoadUserAccount)
+    }
+
+    val context = LocalContext.current
+    LaunchedEffect(viewModel.uiEvents) {
+        viewModel.uiEvents.collect { event ->
+            when (event) {
+                UiEvent.DepositSucceeded -> {
+                    Toast.makeText(
+                        context,
+                        LocalResources.Strings.DepositSuccessful,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     }
 
     Scaffold(snackbarHost = { ErrorSnackBar(snackbarHostState) }) { paddingValues ->

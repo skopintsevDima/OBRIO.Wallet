@@ -6,8 +6,11 @@ import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -26,6 +29,7 @@ import javax.inject.Inject
 
 interface AccountViewModel {
     val uiState: StateFlow<UiState>
+    val uiEvents: SharedFlow<UiEvent>
     fun tryHandleIntent(intent: UiIntent)
 }
 
@@ -40,6 +44,9 @@ class AccountViewModelImpl @Inject constructor(
 ): ViewModel(), AccountViewModel {
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     override val uiState: StateFlow<UiState> = _uiState
+
+    private val _uiEvents = MutableSharedFlow<UiEvent>()
+    override val uiEvents: SharedFlow<UiEvent> = _uiEvents.asSharedFlow()
 
     private var userAccountUpdatesJob: Job? = null
 
@@ -124,9 +131,7 @@ class AccountViewModelImpl @Inject constructor(
                 val depositResult = depositUseCase.execute(depositAmountBTC)
 
                 depositResult.fold(
-                    onSuccess = {
-                        // TODO: Show success message to the user (as a side effect/UiEvent)
-                    },
+                    onSuccess = { _uiEvents.emit(UiEvent.DepositSucceeded) },
                     onFailure = { depositFailed(it) }
                 )
             } catch (e: Throwable) {

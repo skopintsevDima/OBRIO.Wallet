@@ -187,7 +187,7 @@ private fun DataScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = LocalResources.Dimensions.Padding.Medium)
-                .padding(horizontal = LocalResources.Dimensions.Padding.XXLarge),
+                .padding(horizontal = LocalResources.Dimensions.Padding.Large),
             onClick = {
                 viewModel.tryHandleIntent(UiIntent.AddTransaction)
             }

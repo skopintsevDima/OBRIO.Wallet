@@ -12,6 +12,8 @@
     <string name="enter_amount">Enter amount</string>
     <string name="select_category">Select category</string>
     <string name="add">Add</string>
+    <string name="invalid_amount">Invalid amount entered 🙀</string>
+    <string name="deposit_successful">Deposit successful ✅</string>
 
     <string name="error_load_user_account">We can\'t find your account data in the wallet 🙃</string>
     <string name="error_deposit_failed">Deposit failed! Try again! No money - no honey 😭</string>

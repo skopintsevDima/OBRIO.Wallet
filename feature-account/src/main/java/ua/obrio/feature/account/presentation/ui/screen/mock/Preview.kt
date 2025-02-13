@@ -2,11 +2,14 @@ package ua.obrio.feature.account.presentation.ui.screen.mock
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.paging.PagingData
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import ua.obrio.common.domain.model.TransactionModel
 import ua.obrio.feature.account.presentation.ui.screen.AccountViewModel
+import ua.obrio.feature.account.presentation.ui.screen.UiEvent
 import ua.obrio.feature.account.presentation.ui.screen.UiIntent
 import ua.obrio.feature.account.presentation.ui.screen.UiState
 import java.time.LocalDateTime
@@ -15,7 +18,7 @@ internal class MockAccountViewModelWithState(
     state: UiState
 ): AccountViewModel {
     override val uiState: StateFlow<UiState> = MutableStateFlow(state)
-
+    override val uiEvents: SharedFlow<UiEvent> = MutableSharedFlow()
     override fun tryHandleIntent(intent: UiIntent) {
         // Do nothing
     }

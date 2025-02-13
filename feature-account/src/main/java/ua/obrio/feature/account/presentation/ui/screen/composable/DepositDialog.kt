@@ -2,12 +2,13 @@ package ua.obrio.feature.account.presentation.ui.screen.composable
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +29,7 @@ fun DepositDialog(
     onConfirm: (Double) -> Unit
 ) {
     var amount by remember { mutableStateOf(TextFieldValue("")) }
+    var isAmountIncorrect by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -36,25 +38,36 @@ fun DepositDialog(
             val keyboardController = LocalSoftwareKeyboardController.current
 
             Column {
-                TextField(
+                OutlinedTextField(
                     value = amount,
                     onValueChange = {
                         if (it.text.isValidDoubleOrEmpty()) {
                             amount = it
+                            isAmountIncorrect = false
                         }
                     },
                     label = { Text(stringResource(LocalResources.Strings.EnterAmount)) },
+                    isError = isAmountIncorrect,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                        }
+                        onDone = { keyboardController?.hide() }
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
+                if (isAmountIncorrect) {
+                    Text(
+                        text = stringResource(LocalResources.Strings.InvalidAmount),
+                        color = LocalResources.Colors.Red,
+                        fontSize = LocalResources.Dimensions.Text.SizeTiny,
+                        modifier = Modifier.padding(
+                            start = LocalResources.Dimensions.Padding.Small,
+                            top = LocalResources.Dimensions.Padding.Tiny
+                        )
+                    )
+                }
             }
         },
         confirmButton = {
@@ -64,7 +77,7 @@ fun DepositDialog(
                     if (enteredAmount != null && enteredAmount > 0) {
                         onConfirm(enteredAmount)
                     } else {
-                        // TODO: Show error
+                        isAmountIncorrect = true
                     }
                 }
             ) {
