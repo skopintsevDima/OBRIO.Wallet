@@ -22,6 +22,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -111,15 +112,17 @@ private fun DataScreen(
     snackbarHostState: SnackbarHostState
 ) {
     val nonCriticalErrorMsg = remember(data.nonCriticalError) { data.nonCriticalError?.errorMsg }
+    val isNonCriticalErrorShown = rememberSaveable(data.nonCriticalError) { mutableStateOf(false) }
     val actionLabel = stringResource(LocalResources.Strings.Okay)
 
     LaunchedEffect(data.nonCriticalError) {
-        if (!nonCriticalErrorMsg.isNullOrEmpty()) {
+        if (!nonCriticalErrorMsg.isNullOrEmpty() && !isNonCriticalErrorShown.value) {
             snackbarHostState.showSnackBarSafe(
                 message = nonCriticalErrorMsg,
                 actionLabel = actionLabel,
                 loggingTag = AddTransaction.TAG
             )
+            isNonCriticalErrorShown.value = true
         }
     }
 

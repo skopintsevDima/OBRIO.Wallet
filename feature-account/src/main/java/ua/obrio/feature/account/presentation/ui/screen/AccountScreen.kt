@@ -139,15 +139,17 @@ private fun DataScreen(
     navController: NavController
 ) {
     val nonCriticalErrorMsg = remember(data.nonCriticalError) { data.nonCriticalError?.errorMsg }
+    val isNonCriticalErrorShown = rememberSaveable(data.nonCriticalError) { mutableStateOf(false) }
     val actionLabel = stringResource(LocalResources.Strings.Okay)
 
     LaunchedEffect(data.nonCriticalError) {
-        if (!nonCriticalErrorMsg.isNullOrEmpty()) {
+        if (!nonCriticalErrorMsg.isNullOrEmpty() && !isNonCriticalErrorShown.value) {
             snackbarHostState.showSnackBarSafe(
                 message = nonCriticalErrorMsg,
                 actionLabel = actionLabel,
-                loggingTag = Account.TAG
+                loggingTag = AddTransaction.TAG
             )
+            isNonCriticalErrorShown.value = true
         }
     }
 
