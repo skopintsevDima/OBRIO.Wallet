@@ -14,11 +14,11 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -137,7 +137,7 @@ private fun DataScreen(
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
 
-        TextField(
+        OutlinedTextField(
             value = strEnteredAmountBTC,
             onValueChange = {
                 if (it.isValidDoubleOrEmpty()) {

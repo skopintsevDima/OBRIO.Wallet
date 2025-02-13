@@ -46,8 +46,6 @@ object LocalResources {
         @Stable
         val Gray = Color.Gray
         @Stable
-        val LightGray = Color.LightGray
-        @Stable
         val Red = Color.Red
     }
 
@@ -82,6 +80,14 @@ object LocalResources {
             object FillWidth {
                 const val FULL = 1f
             }
+        }
+
+        object Corners {
+            val Medium = 12.dp
+        }
+
+        object Elevation {
+            val Small = 2.dp
         }
     }
 }

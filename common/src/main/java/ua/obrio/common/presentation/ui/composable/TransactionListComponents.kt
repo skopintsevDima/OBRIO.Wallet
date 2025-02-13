@@ -1,6 +1,5 @@
 package ua.obrio.common.presentation.ui.composable
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +12,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,7 +26,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -158,34 +159,56 @@ fun ErrorTransactionsPlaceholder(
 
 @Composable
 fun TransactionItem(transaction: TransactionModel) {
-    Row(
-        modifier = Modifier.fillMaxWidth()
-            .padding(LocalResources.Dimensions.Padding.Small)
-            .background(LocalResources.Colors.LightGray)
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(LocalResources.Dimensions.Padding.Small),
-        horizontalArrangement = Arrangement.SpaceBetween
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        shape = RoundedCornerShape(LocalResources.Dimensions.Corners.Medium),
+        elevation = CardDefaults.elevatedCardElevation(LocalResources.Dimensions.Elevation.Small)
     ) {
-        Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(LocalResources.Dimensions.Padding.Medium),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = transaction.category?.nameFormatted
+                        ?: stringResource(LocalResources.Strings.Deposit).lowercase(),
+                    fontSize = LocalResources.Dimensions.Text.SizeMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Tiny))
+                Text(
+                    text = transaction.dateTimeFormatted,
+                    fontSize = LocalResources.Dimensions.Text.SizeSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
             Text(
-                text = transaction.category?.nameFormatted ?: "",
+                modifier = Modifier
+                    .widthIn(max = LocalResources.TextLabel.TransactionAmountWidthMax)
+                    .padding(start = LocalResources.Dimensions.Padding.Small),
+                text = formatTransactionBTC(transaction.amountBTC),
                 fontSize = LocalResources.Dimensions.Text.SizeMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = transaction.dateTimeFormatted,
-                fontSize = LocalResources.Dimensions.Text.SizeSmall,
-                color = LocalResources.Colors.Gray
+                fontWeight = FontWeight.Bold,
+                color = if (transaction.amountBTC > 0) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.error
+                },
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.End
             )
         }
-        Text(
-            modifier = Modifier.widthIn(max = LocalResources.TextLabel.TransactionAmountWidthMax),
-            text = formatTransactionBTC(transaction.amountBTC),
-            fontSize = LocalResources.Dimensions.Text.SizeMedium,
-            color = if (transaction.amountBTC > 0) Color.Green else Color.Red,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }
 

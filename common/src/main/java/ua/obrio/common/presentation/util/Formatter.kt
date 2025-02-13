@@ -24,7 +24,12 @@ fun formatBalanceBTC(balanceBTC: Double): String {
 }
 
 fun formatTransactionBTC(transactionBTC: Double): String {
-    return BigDecimal(transactionBTC, MathContext.DECIMAL64)
+    val strTransactionAmountBTC = BigDecimal(transactionBTC, MathContext.DECIMAL64)
         .stripTrailingZeros()
         .toPlainString()
+    return if (transactionBTC > 0) {
+        "+$strTransactionAmountBTC"
+    } else {
+        strTransactionAmountBTC
+    }
 }
