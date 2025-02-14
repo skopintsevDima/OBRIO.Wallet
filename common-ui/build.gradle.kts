@@ -2,13 +2,11 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
-    namespace = "ua.obrio.feature.add_transaction"
-    compileSdk = 35
+    namespace = "ua.obrio.common.ui"
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 26
@@ -36,17 +34,15 @@ android {
 }
 
 dependencies {
-    implementation(project(":common-feature"))
-    implementation(project(":common-ui"))
+    api(libs.androidx.material3)
+    api(libs.paging.runtime)
+    api(libs.paging.compose)
+    api(libs.androidx.ui)
+    api(libs.androidx.ui.graphics)
+    api(libs.androidx.ui.tooling.preview)
 
     implementation(platform(libs.androidx.compose.bom))
 
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
-
-    testImplementation(libs.junit)
-    testImplementation(libs.mockk)
-    testImplementation(libs.jetbrains.kotlinx.coroutines.test)
-    testImplementation(libs.androidx.arch.core.testing)
+    debugApi(libs.androidx.ui.tooling)
+    debugApi(libs.androidx.ui.test.manifest)
 }

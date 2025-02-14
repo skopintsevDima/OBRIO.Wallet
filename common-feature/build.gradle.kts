@@ -36,16 +36,13 @@ android {
 }
 
 dependencies {
-    api(platform(libs.androidx.compose.bom))
+    implementation(project(":common-ui"))
+
     api(libs.androidx.core.ktx)
     api(libs.androidx.runtime.android)
     api(libs.androidx.lifecycle.runtime.ktx)
-    api(libs.androidx.ui)
-    api(libs.androidx.ui.graphics)
-    api(libs.androidx.ui.tooling.preview)
-    api(libs.androidx.material3)
-    api(libs.paging.runtime)
-    api(libs.paging.compose)
+
+    implementation(platform(libs.androidx.compose.bom))
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
@@ -59,9 +56,6 @@ dependencies {
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
-
-    debugApi(libs.androidx.ui.tooling)
-    debugApi(libs.androidx.ui.test.manifest)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

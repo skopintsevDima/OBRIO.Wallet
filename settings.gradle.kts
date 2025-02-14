@@ -23,4 +23,5 @@ rootProject.name = "OBRIO.Wallet"
 include(":app")
 include(":feature-account")
 include(":feature-add-transaction")
-include(":common")
+include(":common-feature")
+include(":common-ui")

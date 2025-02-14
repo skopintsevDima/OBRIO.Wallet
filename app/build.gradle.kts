@@ -42,7 +42,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
+    implementation(project(":common-ui"))
     implementation(project(":feature-account"))
     implementation(project(":feature-add-transaction"))
 

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ua.obrio.common.R
+import ua.obrio.common.ui.R
 
 object LocalResources {
     object Icons {

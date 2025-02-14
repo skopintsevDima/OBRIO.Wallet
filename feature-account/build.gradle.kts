@@ -36,7 +36,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
+    implementation(project(":common-feature"))
+    implementation(project(":common-ui"))
 
     implementation(platform(libs.androidx.compose.bom))
 
