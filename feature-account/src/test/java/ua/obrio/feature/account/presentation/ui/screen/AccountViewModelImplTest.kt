@@ -47,8 +47,8 @@ class AccountViewModelImplTest {
 
     private val testAccount = AccountModel(id = 1, currentBalanceBTC = 50.0)
     private val testTransactions = listOf(
-        TransactionModel(LocalDateTime.now(), -5.0, TransactionModel.Category.TAXI),
-        TransactionModel(LocalDateTime.now(), -10.0, TransactionModel.Category.GROCERIES)
+        TransactionModel(id = 1, LocalDateTime.now(), -5.0, TransactionModel.Category.TAXI),
+        TransactionModel(id = 2, LocalDateTime.now(), -10.0, TransactionModel.Category.GROCERIES)
     )
     private val testPagingData = PagingData.from(testTransactions)
 
