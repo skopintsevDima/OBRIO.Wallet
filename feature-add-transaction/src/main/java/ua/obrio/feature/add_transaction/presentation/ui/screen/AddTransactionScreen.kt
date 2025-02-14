@@ -1,5 +1,6 @@
 package ua.obrio.feature.add_transaction.presentation.ui.screen
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,12 +28,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -65,11 +69,7 @@ fun AddTransactionScreen(
     }
 
     Scaffold(snackbarHost = { ErrorSnackBar(snackbarHostState) }) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             when (val stateValue = uiState.value) {
                 is UiState.Error -> ErrorScreen(stateValue, snackbarHostState)
                 is UiState.Data -> DataScreen(stateValue, viewModel, snackbarHostState)
@@ -133,75 +133,84 @@ private fun DataScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(LocalResources.Dimensions.Padding.Medium)
+            .padding(LocalResources.Dimensions.Padding.Medium),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
 
-        OutlinedTextField(
-            value = strEnteredAmountBTC,
-            onValueChange = {
-                if (it.isValidDoubleOrEmpty()) {
-                    viewModel.tryHandleIntent(UiIntent.UpdateEnteredAmount(it))
-                }
-            },
-            label = { Text(stringResource(LocalResources.Strings.EnterAmount)) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number,
-                autoCorrectEnabled = false,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboardController?.hide()
-                }
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-
+        TransactionAmountTextField(strEnteredAmountBTC, viewModel, keyboardController)
         Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Medium))
 
-        Column(
-            modifier = Modifier
-                .weight(LocalResources.Dimensions.Size.FillWidth.FULL)
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = stringResource(LocalResources.Strings.SelectCategory),
-                fontWeight = FontWeight.SemiBold
-            )
+        TransactionCategoriesList(
+            Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL),
+            viewModel,
+            categories,
+            selectedCategory
+        )
 
-            LazyColumn(modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL)) {
-                val onCategoryClick = { categoryName: String ->
-                    val categoryClicked = TransactionModel.Category.of(categoryName)
-                    viewModel.tryHandleIntent(UiIntent.UpdateSelectedCategory(categoryClicked))
-                }
-                itemsIndexed(categories) { _, categoryName ->
-                    TransactionCategory(
-                        selectedCategoryName = selectedCategory?.nameFormatted,
-                        categoryName = categoryName,
-                        onCategoryClick = onCategoryClick
-                    )
-                }
-            }
-        }
+        AddTransactionButton(viewModel)
+    }
+}
 
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = LocalResources.Dimensions.Padding.Medium)
-                .padding(horizontal = LocalResources.Dimensions.Padding.Large),
-            onClick = {
-                viewModel.tryHandleIntent(UiIntent.AddTransaction)
+@Composable
+private fun TransactionAmountTextField(
+    strEnteredAmountBTC: String,
+    viewModel: AddTransactionViewModel,
+    keyboardController: SoftwareKeyboardController?
+) {
+    OutlinedTextField(
+        value = strEnteredAmountBTC,
+        onValueChange = {
+            if (it.isValidDoubleOrEmpty()) {
+                viewModel.tryHandleIntent(UiIntent.UpdateEnteredAmount(it))
             }
-        ) {
-            Text(stringResource(LocalResources.Strings.Add))
+        },
+        label = { Text(stringResource(LocalResources.Strings.EnterAmount)) },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Number,
+            autoCorrectEnabled = false,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                keyboardController?.hide()
+            }
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+private fun TransactionCategoriesList(
+    modifier: Modifier,
+    viewModel: AddTransactionViewModel,
+    categories: List<String>,
+    selectedCategory: TransactionModel.Category?
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(LocalResources.Strings.SelectCategory),
+            fontWeight = FontWeight.SemiBold
+        )
+
+        LazyColumn(modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL)) {
+            val onCategoryClick = { categoryName: String ->
+                val categoryClicked = TransactionModel.Category.of(categoryName)
+                viewModel.tryHandleIntent(UiIntent.UpdateSelectedCategory(categoryClicked))
+            }
+            itemsIndexed(categories) { _, categoryName ->
+                TransactionCategoryItem(
+                    selectedCategoryName = selectedCategory?.nameFormatted,
+                    categoryName = categoryName,
+                    onCategoryClick = onCategoryClick
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun TransactionCategory(
+private fun TransactionCategoryItem(
     selectedCategoryName: String?,
     categoryName: String,
     onCategoryClick: (String) -> Unit
@@ -221,6 +230,29 @@ private fun TransactionCategory(
             text = categoryName,
             modifier = Modifier.padding(start = LocalResources.Dimensions.Padding.Small)
         )
+    }
+}
+
+@Composable
+private fun AddTransactionButton(viewModel: AddTransactionViewModel) {
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    val paddingHorizontal = if (isLandscape) {
+        LocalResources.Dimensions.Padding.XXXLarge
+    } else {
+        0.dp
+    }
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                vertical = LocalResources.Dimensions.Padding.Small,
+                horizontal = paddingHorizontal
+            ),
+        onClick = { viewModel.tryHandleIntent(UiIntent.AddTransaction) }
+    ) {
+        Text(stringResource(LocalResources.Strings.Add))
     }
 }
 

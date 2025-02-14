@@ -43,6 +43,12 @@ fun TransactionsList(
     modifier: Modifier,
     transactions: LazyPagingItems<TransactionModel>
 ) {
+    Text(
+        text = stringResource(LocalResources.Strings.Transactions),
+        fontSize = LocalResources.Dimensions.Text.SizeMedium,
+        fontWeight = FontWeight.SemiBold
+    )
+    Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Small))
     when {
         transactions.loadState.refresh is LoadState.Loading -> {
             TransactionsLoader(modifier)
@@ -119,7 +125,7 @@ private fun rememberForeverLazyListState(
 }
 
 @Composable
-fun EmptyTransactionsPlaceholder(modifier: Modifier) {
+private fun EmptyTransactionsPlaceholder(modifier: Modifier) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Text(
             text = stringResource(LocalResources.Strings.NoTransactionsMessage),
@@ -131,7 +137,7 @@ fun EmptyTransactionsPlaceholder(modifier: Modifier) {
 }
 
 @Composable
-fun ErrorTransactionsPlaceholder(
+private fun ErrorTransactionsPlaceholder(
     modifier: Modifier,
     onRetry: () -> Unit
 ) {
@@ -158,7 +164,7 @@ fun ErrorTransactionsPlaceholder(
 }
 
 @Composable
-fun TransactionItem(transaction: TransactionModel) {
+private fun TransactionItem(transaction: TransactionModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -213,7 +219,7 @@ fun TransactionItem(transaction: TransactionModel) {
 }
 
 @Composable
-fun TransactionsLoader(modifier: Modifier = Modifier) {
+private fun TransactionsLoader(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -227,7 +233,7 @@ fun TransactionsLoader(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TransactionsRetryButton(
+private fun TransactionsRetryButton(
     onClick: () -> Unit
 ) {
     Box(

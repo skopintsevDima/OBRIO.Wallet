@@ -58,7 +58,7 @@ object LocalResources {
             val Tiny = 4.dp
             val Small = 8.dp
             val Medium = 16.dp
-            val Large = 40.dp
+            val XXXLarge = 150.dp
         }
 
         object Icon {

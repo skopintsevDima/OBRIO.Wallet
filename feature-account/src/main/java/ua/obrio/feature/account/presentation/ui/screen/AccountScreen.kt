@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -82,11 +83,7 @@ fun AccountScreen(
     }
 
     Scaffold(snackbarHost = { ErrorSnackBar(snackbarHostState) }) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             when (val stateValue = uiState.value) {
                 UiState.Loading -> LoadingScreen()
                 is UiState.Error -> ErrorScreen(stateValue, viewModel, snackbarHostState)
@@ -173,7 +170,7 @@ private fun DataScreen(
 }
 
 @Composable
-fun DataPortraitScreen(
+private fun DataPortraitScreen(
     data: UiState.Data,
     userTransactions: LazyPagingItems<TransactionModel>,
     onDepositConfirmed: (Double) -> Unit,
@@ -185,54 +182,20 @@ fun DataPortraitScreen(
 
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(LocalResources.Dimensions.Padding.Medium)) {
-        Text(
-            text = stringResource(LocalResources.Strings.PriceBTCinUSD, btcPriceUSD),
-            fontSize = LocalResources.Dimensions.Text.SizeSmall,
-            color = LocalResources.Colors.Gray,
-            modifier = Modifier.align(Alignment.End)
-        )
+        .padding(LocalResources.Dimensions.Padding.Medium)
+    ) {
+        BitcoinPriceLabel(btcPriceUSD, modifier = Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Medium))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val formattedBalanceBTC = formatBalanceBTC(balanceBTC)
-            Text(
-                modifier = Modifier.weight(1f),
-                text = stringResource(LocalResources.Strings.BalanceInBTC, formattedBalanceBTC),
-                fontSize = LocalResources.Dimensions.Text.SizeLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Button(onClick = { showDepositDialog = true }) {
-                Text(stringResource(LocalResources.Strings.Deposit))
-            }
-        }
 
+        DataScreenHeader(balanceBTC) { showDepositDialog = true }
         Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Medium))
-        Text(
-            text = stringResource(LocalResources.Strings.Transactions),
-            fontSize = LocalResources.Dimensions.Text.SizeMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-        Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Small))
 
         TransactionsList(
-            modifier = Modifier.weight(
-                LocalResources.Dimensions.Size.FillWidth.FULL
-            ),
+            modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL),
             userTransactions
         )
 
-        Button(
-            onClick = onAddTransactionClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = LocalResources.Dimensions.Padding.Small)
-        ) {
-            Text(stringResource(LocalResources.Strings.AddTransaction))
-        }
+        AddTransactionButton(onAddTransactionClick)
     }
 
     if (showDepositDialog) {
@@ -259,60 +222,27 @@ private fun DataLandscapeScreen(
 
     Row(modifier = Modifier
         .fillMaxSize()
-        .padding(LocalResources.Dimensions.Padding.Medium)) {
+        .padding(LocalResources.Dimensions.Padding.Medium)
+        .padding(bottom = 0.dp)
+    ) {
         Column(
             modifier = Modifier
-                .weight(1f)
+                .weight(LocalResources.Dimensions.Size.FillWidth.FULL)
                 .padding(end = LocalResources.Dimensions.Padding.Medium)
         ) {
-            Text(
-                text = stringResource(LocalResources.Strings.PriceBTCinUSD, btcPriceUSD),
-                fontSize = LocalResources.Dimensions.Text.SizeSmall,
-                color = LocalResources.Colors.Gray,
-                modifier = Modifier.align(Alignment.End)
-            )
+            BitcoinPriceLabel(btcPriceUSD, modifier = Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Medium))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val formattedBalanceBTC = formatBalanceBTC(balanceBTC)
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(LocalResources.Strings.BalanceInBTC, formattedBalanceBTC),
-                    fontSize = LocalResources.Dimensions.Text.SizeLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Button(onClick = { showDepositDialog = true }) {
-                    Text(stringResource(LocalResources.Strings.Deposit))
-                }
-            }
+
+            DataScreenHeader(balanceBTC) { showDepositDialog = true }
         }
 
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = stringResource(LocalResources.Strings.Transactions),
-                fontSize = LocalResources.Dimensions.Text.SizeMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Small))
-
+        Column(modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL)) {
             TransactionsList(
-                modifier = Modifier.weight(
-                    LocalResources.Dimensions.Size.FillWidth.FULL
-                ),
+                modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL),
                 userTransactions
             )
 
-            Button(
-                onClick = onAddTransactionClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = LocalResources.Dimensions.Padding.Small)
-            ) {
-                Text(stringResource(LocalResources.Strings.AddTransaction))
-            }
+            AddTransactionButton(onAddTransactionClick)
         }
     }
 
@@ -324,6 +254,48 @@ private fun DataLandscapeScreen(
                 showDepositDialog = false
             }
         )
+    }
+}
+
+@Composable
+private fun BitcoinPriceLabel(btcPriceUSD: Float, modifier: Modifier) {
+    Text(
+        text = stringResource(LocalResources.Strings.PriceBTCinUSD, btcPriceUSD),
+        fontSize = LocalResources.Dimensions.Text.SizeSmall,
+        color = LocalResources.Colors.Gray,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun DataScreenHeader(balanceBTC: Double, onDepositClicked: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val formattedBalanceBTC = formatBalanceBTC(balanceBTC)
+        Text(
+            modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL),
+            text = stringResource(LocalResources.Strings.BalanceInBTC, formattedBalanceBTC),
+            fontSize = LocalResources.Dimensions.Text.SizeLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Button(onClick = onDepositClicked) {
+            Text(stringResource(LocalResources.Strings.Deposit))
+        }
+    }
+}
+
+@Composable
+private fun AddTransactionButton(onAddTransactionClick: () -> Unit) {
+    Button(
+        onClick = onAddTransactionClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = LocalResources.Dimensions.Padding.Small)
+    ) {
+        Text(stringResource(LocalResources.Strings.AddTransaction))
     }
 }
 
