@@ -1,4 +1,17 @@
 [versions]
+# SDK versioning
+compileSdk = "35"
+targetSdk = "35"
+minSdk = "26"
+
+# Kotlin JVM target
+jvmTarget = "11"
+
+# App versioning
+versionCode = "1"
+versionName = "1.0"
+
+# Libs versioning
 agp = "8.7.3"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
