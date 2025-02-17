@@ -1,15 +1,14 @@
 package ua.obrio.feature.add_transaction.presentation.ui.screen
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ua.obrio.common.presentation.ui.model.NonCriticalError
 import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
+import ua.obrio.common.presentation.ui.screen.base.BaseViewModel
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.AddTransaction.ERROR_ADDING_TRANSACTION_FAILED
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.AddTransaction.ERROR_INCORRECT_AMOUNT_FOR_TRANSACTION
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.AddTransaction.ERROR_INSUFFICIENT_BALANCE
@@ -28,18 +27,17 @@ interface AddTransactionViewModel {
 
 @HiltViewModel
 class AddTransactionViewModelImpl @Inject constructor(
-    private val resourceProvider: ResourceProvider,
     private val addTransactionUseCase: AddTransactionUseCase,
-    private val backgroundOpsDispatcher: CoroutineDispatcher
-): ViewModel(), AddTransactionViewModel {
-    private val _uiState = MutableStateFlow<UiState>(
-        UiState.Data(
-            strEnteredAmountBTC = "",
-            selectedCategory = null
-        )
-    )
-    override val uiState: StateFlow<UiState> = _uiState
-
+    resourceProvider: ResourceProvider,
+    backgroundOpsDispatcher: CoroutineDispatcher
+): BaseViewModel<UiState, UiIntent, UiResult, UiEvent>(
+    initialState = UiState.Data(
+        strEnteredAmountBTC = "",
+        selectedCategory = null
+    ),
+    resourceProvider,
+    backgroundOpsDispatcher
+), AddTransactionViewModel {
     override fun tryHandleIntent(intent: UiIntent) {
         try {
             handleIntent(intent)
@@ -51,7 +49,7 @@ class AddTransactionViewModelImpl @Inject constructor(
         }
     }
 
-    private fun handleIntent(intent: UiIntent) {
+    override fun handleIntent(intent: UiIntent) {
         when (intent) {
             is UiIntent.UpdateEnteredAmount -> {
                 val uiResult = UiResult.Success.EnteredAmountUpdated(
@@ -96,7 +94,7 @@ class AddTransactionViewModelImpl @Inject constructor(
         }
     }
 
-    private fun reduce(previousState: UiState, result: UiResult): UiState = when (result) {
+    override fun reduce(previousState: UiState, result: UiResult): UiState = when (result) {
         is UiResult.Success.EnteredAmountUpdated -> previousState.asData?.copy(
             strEnteredAmountBTC = result.strEnteredAmountBTC
         ) ?: previousState

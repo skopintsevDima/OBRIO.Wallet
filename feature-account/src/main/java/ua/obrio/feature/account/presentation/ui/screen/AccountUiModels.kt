@@ -7,9 +7,13 @@ import ua.obrio.common.domain.model.TransactionModel
 import ua.obrio.common.presentation.ui.model.NonCriticalError
 import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
+import ua.obrio.common.presentation.ui.screen.base.BaseUiEvent
+import ua.obrio.common.presentation.ui.screen.base.BaseUiIntent
+import ua.obrio.common.presentation.ui.screen.base.BaseUiResult
+import ua.obrio.common.presentation.ui.screen.base.BaseUiState
 import ua.obrio.common.presentation.util.Constants.ErrorCodes
 
-sealed class UiState {
+sealed class UiState: BaseUiState() {
     data object Loading: UiState()
 
     data class Data(
@@ -39,13 +43,13 @@ sealed class UiState {
         get() = this as? Data
 }
 
-sealed class UiIntent {
+sealed class UiIntent: BaseUiIntent() {
     data object LoadUserAccount: UiIntent()
     data class SaveDepositEnteredAmount(val enteredAmountStr: String?): UiIntent()
     data class Deposit(val amountBTC: Double): UiIntent()
 }
 
-sealed class UiResult {
+sealed class UiResult: BaseUiResult() {
     sealed class Success: UiResult() {
         data class ScreenDataUpdated(
             val userAccount: AccountModel,
@@ -73,6 +77,6 @@ sealed class UiResult {
     }
 }
 
-sealed class UiEvent {
+sealed class UiEvent: BaseUiEvent() {
     data object DepositSucceeded: UiEvent()
 }

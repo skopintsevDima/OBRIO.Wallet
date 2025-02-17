@@ -1,22 +1,19 @@
 package ua.obrio.feature.account.presentation.ui.screen
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import ua.obrio.common.presentation.ui.model.NonCriticalError
 import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
+import ua.obrio.common.presentation.ui.screen.base.BaseViewModel
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_DEPOSIT_FAILED
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Account.ERROR_LOAD_USER_ACCOUNT
 import ua.obrio.common.presentation.util.Constants.ErrorCodes.Common.ERROR_UNKNOWN
@@ -39,15 +36,13 @@ class AccountViewModelImpl @Inject constructor(
     private val getUserTransactionsPagedUseCase: GetUserTransactionsPagedUseCase,
     private val getBitcoinExchangeRateUseCase: GetBitcoinExchangeRateUseCase,
     private val depositUseCase: DepositUseCase,
-    private val resourceProvider: ResourceProvider,
-    private val backgroundOpsDispatcher: CoroutineDispatcher,
-): ViewModel(), AccountViewModel {
-    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
-    override val uiState: StateFlow<UiState> = _uiState
-
-    private val _uiEvents = MutableSharedFlow<UiEvent>()
-    override val uiEvents: SharedFlow<UiEvent> = _uiEvents.asSharedFlow()
-
+    resourceProvider: ResourceProvider,
+    backgroundOpsDispatcher: CoroutineDispatcher,
+): BaseViewModel<UiState, UiIntent, UiResult, UiEvent>(
+    initialState = UiState.Loading,
+    resourceProvider,
+    backgroundOpsDispatcher
+), AccountViewModel {
     private var userAccountUpdatesJob: Job? = null
 
     private fun observeUserAccountUpdates() {
@@ -89,7 +84,7 @@ class AccountViewModelImpl @Inject constructor(
         }
     }
 
-    private fun handleIntent(intent: UiIntent) {
+    override fun handleIntent(intent: UiIntent) {
         when (intent) {
             is UiIntent.LoadUserAccount -> observeUserAccountUpdates()
             is UiIntent.SaveDepositEnteredAmount -> saveDepositEnteredAmount(intent.enteredAmountStr)
@@ -97,7 +92,7 @@ class AccountViewModelImpl @Inject constructor(
         }
     }
 
-    private fun reduce(previousState: UiState, result: UiResult): UiState = when (result) {
+    override fun reduce(previousState: UiState, result: UiResult): UiState = when (result) {
         is UiResult.Success.ScreenDataUpdated -> {
             UiState.Data(
                 userBalanceBTC = result.userAccount.currentBalanceBTC,

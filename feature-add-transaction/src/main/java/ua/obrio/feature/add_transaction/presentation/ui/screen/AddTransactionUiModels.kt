@@ -4,9 +4,13 @@ import ua.obrio.common.domain.model.TransactionModel.Category
 import ua.obrio.common.presentation.ui.model.NonCriticalError
 import ua.obrio.common.presentation.ui.resources.LocalResources
 import ua.obrio.common.presentation.ui.resources.provider.ResourceProvider
+import ua.obrio.common.presentation.ui.screen.base.BaseUiEvent
+import ua.obrio.common.presentation.ui.screen.base.BaseUiIntent
+import ua.obrio.common.presentation.ui.screen.base.BaseUiResult
+import ua.obrio.common.presentation.ui.screen.base.BaseUiState
 import ua.obrio.common.presentation.util.Constants.ErrorCodes
 
-sealed class UiState {
+sealed class UiState: BaseUiState() {
     data class Data(
         val strEnteredAmountBTC: String,
         val selectedCategory: Category?,
@@ -34,7 +38,7 @@ sealed class UiState {
         get() = this as? Data
 }
 
-sealed class UiIntent {
+sealed class UiIntent:BaseUiIntent() {
     data class UpdateEnteredAmount(
         val strEnteredAmountBTC: String
     ) : UiIntent()
@@ -46,7 +50,7 @@ sealed class UiIntent {
     data object AddTransaction: UiIntent()
 }
 
-sealed class UiResult {
+sealed class UiResult: BaseUiResult() {
     sealed class Success: UiResult() {
         data class EnteredAmountUpdated(
             val strEnteredAmountBTC: String
@@ -70,3 +74,5 @@ sealed class UiResult {
         }
     }
 }
+
+sealed class UiEvent: BaseUiEvent()
