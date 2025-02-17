@@ -16,6 +16,7 @@ sealed class UiState {
         val userBalanceBTC: Double,
         val userTransactions: Flow<PagingData<TransactionModel>>,
         val bitcoinExchangeRateUSD: Float,
+        val depositEnteredAmountStr: String? = null,
         val nonCriticalError: NonCriticalError? = null
     ): UiState()
 
@@ -40,6 +41,7 @@ sealed class UiState {
 
 sealed class UiIntent {
     data object LoadUserAccount: UiIntent()
+    data class SaveDepositEnteredAmount(val enteredAmountStr: String?): UiIntent()
     data class Deposit(val amountBTC: Double): UiIntent()
 }
 
@@ -49,6 +51,10 @@ sealed class UiResult {
             val userAccount: AccountModel,
             val userTransactionsPaged: Flow<PagingData<TransactionModel>>,
             val bitcoinExchangeRateUSD: Float
+        ): Success()
+
+        data class DepositEnteredAmountSaved(
+            val enteredAmountStr: String?
         ): Success()
     }
 

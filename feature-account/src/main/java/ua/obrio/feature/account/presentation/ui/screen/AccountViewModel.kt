@@ -92,6 +92,7 @@ class AccountViewModelImpl @Inject constructor(
     private fun handleIntent(intent: UiIntent) {
         when (intent) {
             is UiIntent.LoadUserAccount -> observeUserAccountUpdates()
+            is UiIntent.SaveDepositEnteredAmount -> saveDepositEnteredAmount(intent.enteredAmountStr)
             is UiIntent.Deposit -> deposit(intent.amountBTC)
         }
     }
@@ -103,6 +104,12 @@ class AccountViewModelImpl @Inject constructor(
                 userTransactions = result.userTransactionsPaged,
                 bitcoinExchangeRateUSD = result.bitcoinExchangeRateUSD
             )
+        }
+
+        is UiResult.Success.DepositEnteredAmountSaved -> {
+            previousState.asData?.copy(
+                depositEnteredAmountStr = result.enteredAmountStr
+            ) ?: previousState
         }
 
         is UiResult.Failure -> {
@@ -119,6 +126,13 @@ class AccountViewModelImpl @Inject constructor(
                 else -> result.toError(resourceProvider)
             }
         }
+    }
+
+    private fun saveDepositEnteredAmount(amountStr: String?) {
+        _uiState.value = reduce(
+            _uiState.value,
+            UiResult.Success.DepositEnteredAmountSaved(amountStr)
+        )
     }
 
     private fun deposit(depositAmountBTC: Double) {

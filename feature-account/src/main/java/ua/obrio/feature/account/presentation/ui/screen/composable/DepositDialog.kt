@@ -10,6 +10,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,14 +26,32 @@ import ua.obrio.common.presentation.util.isValidDoubleOrEmpty
 
 @Composable
 fun DepositDialog(
+    enteredAmountStr: String,
     onDismiss: () -> Unit,
-    onConfirm: (Double) -> Unit
+    onConfirm: (Double) -> Unit,
+    onDispose: (String?) -> Unit
 ) {
-    var amount by remember { mutableStateOf(TextFieldValue("")) }
+    var amount by remember { mutableStateOf(TextFieldValue(enteredAmountStr)) }
     var isAmountIncorrect by remember { mutableStateOf(false) }
+    var shouldDisposeEnteredAmount by remember { mutableStateOf(false) }
+    val dismiss = {
+        shouldDisposeEnteredAmount = true
+        onDismiss()
+    }
+    val confirm = { enteredAmount: Double ->
+        shouldDisposeEnteredAmount = true
+        onConfirm(enteredAmount)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            val enteredAmountToSave = amount.text.takeIf { !shouldDisposeEnteredAmount }
+            onDispose(enteredAmountToSave)
+        }
+    }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { dismiss() },
         title = { Text(stringResource(LocalResources.Strings.Deposit)) },
         text = {
             val keyboardController = LocalSoftwareKeyboardController.current
@@ -75,7 +94,7 @@ fun DepositDialog(
                 onClick = {
                     val enteredAmount = amount.text.toDoubleOrNull()
                     if (enteredAmount != null && enteredAmount > 0) {
-                        onConfirm(enteredAmount)
+                        confirm(enteredAmount)
                     } else {
                         isAmountIncorrect = true
                     }
@@ -85,7 +104,7 @@ fun DepositDialog(
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
+            Button(onClick = { dismiss() }) {
                 Text(stringResource(LocalResources.Strings.Cancel))
             }
         }

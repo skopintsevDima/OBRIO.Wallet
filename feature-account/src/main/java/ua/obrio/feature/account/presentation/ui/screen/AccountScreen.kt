@@ -153,33 +153,69 @@ private fun DataScreen(
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
+    val balanceBTC = remember(data) { data.userBalanceBTC }
+    val btcPriceUSD = remember(data) { data.bitcoinExchangeRateUSD }
+    val depositEnteredAmountStr = remember(data) { data.depositEnteredAmountStr ?: "" }
+    var showDepositDialog by remember { mutableStateOf(data.depositEnteredAmountStr != null) }
+    val userTransactions = data.userTransactions.collectAsLazyPagingItems()
+    val onDepositClicked = { showDepositDialog = true }
+    val onDepositDismissed = { showDepositDialog = false }
     val onDepositConfirmed = remember(viewModel) {
         { depositAmountBTC: Double ->
             viewModel.tryHandleIntent(UiIntent.Deposit(depositAmountBTC))
+            showDepositDialog = false
+        }
+    }
+    val onDepositDisposed = remember(viewModel) {
+        { depositEnteredAmountStr: String? ->
+            viewModel.tryHandleIntent(UiIntent.SaveDepositEnteredAmount(depositEnteredAmountStr))
         }
     }
     val onAddTransactionClick = remember(viewModel) {
         { navController.navigate(AddTransaction.ROUTE_ID) }
     }
-    val userTransactions = data.userTransactions.collectAsLazyPagingItems()
     if (isLandscape) {
-        DataLandscapeScreen(data, userTransactions, onDepositConfirmed, onAddTransactionClick)
+        DataLandscapeScreen(
+            balanceBTC,
+            btcPriceUSD,
+            showDepositDialog,
+            depositEnteredAmountStr,
+            userTransactions,
+            onDepositClicked,
+            onDepositDismissed,
+            onDepositConfirmed,
+            onDepositDisposed,
+            onAddTransactionClick
+        )
     } else {
-        DataPortraitScreen(data, userTransactions, onDepositConfirmed, onAddTransactionClick)
+        DataPortraitScreen(
+            balanceBTC,
+            btcPriceUSD,
+            showDepositDialog,
+            depositEnteredAmountStr,
+            userTransactions,
+            onDepositClicked,
+            onDepositDismissed,
+            onDepositConfirmed,
+            onDepositDisposed,
+            onAddTransactionClick
+        )
     }
 }
 
 @Composable
 private fun DataPortraitScreen(
-    data: UiState.Data,
+    balanceBTC: Double,
+    btcPriceUSD: Float,
+    showDepositDialog: Boolean,
+    depositEnteredAmountStr: String,
     userTransactions: LazyPagingItems<TransactionModel>,
+    onDepositClicked: () -> Unit,
+    onDepositDismissed: () -> Unit,
     onDepositConfirmed: (Double) -> Unit,
+    onDepositDisposed: (String?) -> Unit,
     onAddTransactionClick: () -> Unit
 ) {
-    val balanceBTC = remember(data) { data.userBalanceBTC }
-    val btcPriceUSD = remember(data) { data.bitcoinExchangeRateUSD }
-    var showDepositDialog by remember { mutableStateOf(false) }
-
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(LocalResources.Dimensions.Padding.Medium)
@@ -187,7 +223,7 @@ private fun DataPortraitScreen(
         BitcoinPriceLabel(btcPriceUSD, modifier = Modifier.align(Alignment.End))
         Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Medium))
 
-        DataScreenHeader(balanceBTC) { showDepositDialog = true }
+        DataScreenHeader(balanceBTC, onDepositClicked)
         Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Medium))
 
         TransactionsList(
@@ -200,26 +236,27 @@ private fun DataPortraitScreen(
 
     if (showDepositDialog) {
         DepositDialog(
-            onDismiss = { showDepositDialog = false },
-            onConfirm = {
-                depositAmountBTC -> onDepositConfirmed(depositAmountBTC)
-                showDepositDialog = false
-            }
+            depositEnteredAmountStr,
+            onDismiss = onDepositDismissed,
+            onConfirm = onDepositConfirmed,
+            onDispose = onDepositDisposed
         )
     }
 }
 
 @Composable
 private fun DataLandscapeScreen(
-    data: UiState.Data,
+    balanceBTC: Double,
+    btcPriceUSD: Float,
+    showDepositDialog: Boolean,
+    depositEnteredAmountStr: String,
     userTransactions: LazyPagingItems<TransactionModel>,
+    onDepositClicked: () -> Unit,
+    onDepositDismissed: () -> Unit,
     onDepositConfirmed: (Double) -> Unit,
+    onDepositDisposed: (String?) -> Unit,
     onAddTransactionClick: () -> Unit
 ) {
-    val balanceBTC = remember(data) { data.userBalanceBTC }
-    val btcPriceUSD = remember(data) { data.bitcoinExchangeRateUSD }
-    var showDepositDialog by remember { mutableStateOf(false) }
-
     Row(modifier = Modifier
         .fillMaxSize()
         .padding(LocalResources.Dimensions.Padding.Medium)
@@ -233,7 +270,7 @@ private fun DataLandscapeScreen(
             BitcoinPriceLabel(btcPriceUSD, modifier = Modifier.align(Alignment.End))
             Spacer(modifier = Modifier.height(LocalResources.Dimensions.Padding.Medium))
 
-            DataScreenHeader(balanceBTC) { showDepositDialog = true }
+            DataScreenHeader(balanceBTC, onDepositClicked)
         }
 
         Column(modifier = Modifier.weight(LocalResources.Dimensions.Size.FillWidth.FULL)) {
@@ -248,11 +285,10 @@ private fun DataLandscapeScreen(
 
     if (showDepositDialog) {
         DepositDialog(
-            onDismiss = { showDepositDialog = false },
-            onConfirm = {
-                depositAmountBTC -> onDepositConfirmed(depositAmountBTC)
-                showDepositDialog = false
-            }
+            depositEnteredAmountStr,
+            onDismiss = onDepositDismissed,
+            onConfirm = onDepositConfirmed,
+            onDispose = onDepositDisposed
         )
     }
 }
